@@ -6,32 +6,32 @@
 #include "BME680.h"
 #include "pms5003.hpp"
 
-#define GAS_SENSOR_TEST 0
+// #define GAS_SENSOR_TEST 0
 
-bme680_fields_t gas_sensor_fields;
+// bme680_fields_t gas_sensor_fields;
 void app_main()
 {
-  gas_sensor_fields.precision = disabled;
-  bme680_setup(gas_sensor_fields.precision);
+  // gas_sensor_fields.precision = disabled;
+  // bme680_setup(gas_sensor_fields.precision);
 
-  PM25_AQI_Data data;
-  pms_init(&data);
+  // PM25_AQI_Data data;
+  // pms_init(&data);
 
   while (1)
   {
-    #if GAS_SENSOR_TEST
-      bme680_test();
-    #else
-      pms_print_data(&data);
-      if(bme680_read(&gas_sensor_fields) == ESP_OK)
-      {
-        printf("Temperature = %0.2f *C\n",gas_sensor_fields.temperature);
-        printf("Pressure = %0.2f hPa\n",gas_sensor_fields.pressure);
-        printf("Humidity = %0.2f %%\n",gas_sensor_fields.humidity);
-        printf("Gas = %0.2f KOhms\n",gas_sensor_fields.gas_resistance);
-        printf("Approx. Altitude = %0.2f m\n\n",gas_sensor_fields.altitude);
-      }
-    #endif
+    // #if GAS_SENSOR_TEST
+    //   bme680_test();
+    // #else
+    //   pms_print_data(&data);
+    //   if(bme680_read(&gas_sensor_fields) == ESP_OK)
+    //   {
+    //     printf("Temperature = %0.2f *C\n",gas_sensor_fields.temperature);
+    //     printf("Pressure = %0.2f hPa\n",gas_sensor_fields.pressure);
+    //     printf("Humidity = %0.2f %%\n",gas_sensor_fields.humidity);
+    //     printf("Gas = %0.2f KOhms\n",gas_sensor_fields.gas_resistance);
+    //     printf("Approx. Altitude = %0.2f m\n\n",gas_sensor_fields.altitude);
+    //   }
+    // #endif
       vTaskDelay(1000/portTICK_RATE_MS);
   }  
 }
