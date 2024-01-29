@@ -4,6 +4,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "BME680.h"
+#include "pms5003.hpp"
 
 #define GAS_SENSOR_TEST 0
 
@@ -12,11 +13,16 @@ void app_main()
 {
   gas_sensor_fields.precision = disabled;
   bme680_setup(gas_sensor_fields.precision);
+
+  PM25_AQI_Data data;
+  pms_init(&data);
+
   while (1)
   {
     #if GAS_SENSOR_TEST
       bme680_test();
     #else
+      pms_print_data(&data);
       if(bme680_read(&gas_sensor_fields) == ESP_OK)
       {
         printf("Temperature = %0.2f *C\n",gas_sensor_fields.temperature);
