@@ -45,12 +45,14 @@ extern "C" {
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "esp_err.h"
 
-#include "i2c_bus.h"
+#include "ezlopi_i2c_master.h"
 
 /* Exported Macros -----------------------------------------------------------*/
 /* ADS101x I2C device address */
-#define ADS101X_I2C_ADDRESS	0x48 /* ADDR pin connected to GND */
+#define ADS101X_I2C_ADDRESS_GND	0x48 /* ADDR pin connected to GND */
+#define ADS101X_I2C_ADDRESS_VDD	0x49 /* ADDR pin connected to VDD */
 
 /* Pointer registers */
 #define ADS101X_REG_POINTER_MASK			0x03 /* Point mask */
@@ -157,7 +159,8 @@ typedef enum {
 } ads101x_channel_t;
 
 typedef struct {
-	i2c_bus_dev_t *i2c_dev;
+	// i2c_bus_dev_t *i2c_dev;
+	s_ezlopi_i2c_master_t* ezlopi_i2c;
 	ads101x_model_t model;
 	ads101x_gain_t gain;
 	ads101x_data_rate_t data_rate;
@@ -184,7 +187,7 @@ typedef struct {
  * @return ESP_OK on success
  */
 esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin,
-		i2c_bus_t *i2c_bus, uint8_t dev_addr, i2c_bus_read_t read, i2c_bus_write_t write);
+		uint8_t dev_addr);
 
 /**
  * @brief Function that reads a specific single-ended ADC channel.

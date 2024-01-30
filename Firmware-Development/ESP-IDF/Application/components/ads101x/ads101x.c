@@ -38,6 +38,7 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include <string.h>
 
 /* Private macros ------------------------------------------------------------*/
 #define NOP() asm volatile ("nop")
@@ -92,8 +93,7 @@ static void IRAM_ATTR isr_handler(void *arg);
 /**
  * @brief Function to initialize a ADS101x instance
  */
-esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin,
-		i2c_bus_t *i2c_bus, uint8_t dev_addr, i2c_bus_read_t read, i2c_bus_write_t write) {
+esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin, uint8_t dev_addr) {
 	/* Print initializing message */
 	ESP_LOGI(TAG, "Initializing instance...");
 
@@ -108,16 +108,28 @@ esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t in
 	me->is_complete = false;
 	me->int_pin = int_pin;
 
-	/* Add device to bus */
-	ret = i2c_bus_add_dev(i2c_bus, dev_addr, "ads101x", NULL, NULL);
+	// /* Add device to bus */
+	// ret = i2c_bus_add_dev(i2c_bus, dev_addr, "ads101x", NULL, NULL);
 
-	if (ret != ESP_OK) {
-		ESP_LOGE(TAG, "Failed to add device");
-		return ret;
-	}
+	// if (ret != ESP_OK) {
+	// 	ESP_LOGE(TAG, "Failed to add device");
+	// 	return ret;
+	// }
+	s_ezlopi_i2c_master_t ads101x_i2c_master_conf = {
+        .enable = true,
+        .address = dev_addr,
+        .channel = I2C_NUM_0,
+        .sda = 18,
+        .scl = 17,
+        .clock_speed = 400000,
+    };
+
+	ezlopi_i2c_master_init(&ads101x_i2c_master_conf);
+	me->ezlopi_i2c = (s_ezlopi_i2c_master_t*) malloc(sizeof(s_ezlopi_i2c_master_t));
+	memcpy(me->ezlopi_i2c, &ads101x_i2c_master_conf, sizeof(s_ezlopi_i2c_master_t));
 
 	/**/
-	me->i2c_dev = &i2c_bus->devs.dev[i2c_bus->devs.num - 1]; /* todo: write function to get the dev from name */
+	// me->i2c_dev = &i2c_bus->devs.dev[i2c_bus->devs.num - 1]; /* todo: write function to get the dev from name */
 
 	/**/
 	gpio_config_t gpio_conf;
@@ -128,7 +140,7 @@ esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t in
 	gpio_conf.pull_up_en = GPIO_PULLUP_ENABLE;
 
 	gpio_config(&gpio_conf);
-  gpio_install_isr_service(0);
+  	gpio_install_isr_service(0);
 	gpio_isr_handler_add(me->int_pin, isr_handler, (void *)me);
 
 	/* Print successful initialization message */
@@ -168,14 +180,15 @@ esp_err_t ads101x_read_single_ended(ads101x_t *const me,
 		return ESP_FAIL;
 	}
 
-	/* Check if the conversion is complete */
-//	do {
-//		delay_us(5 * 1000); /* Wait for 5 ms */
-//		ads101x_conversion_complete(me, &conversion_is_complete);
-//
-//	} while (!me->is_complete);
+	// For Software Interrupt
+	/* Check if the conversion is complete */ 
+	// do {
+	// 	delay_us(5 * 1000); /* Wait for 5 ms */
+	// 	ads101x_conversion_complete(me, &(me->is_complete));
 
-	while (!me->is_complete) {};
+	// } while (!me->is_complete);
+
+	while (!me->is_complete) {}; // For Harware Interrupt
 
 	me->is_complete = false;
 
@@ -360,12 +373,12 @@ esp_err_t ads101x_start_comparator_single_ended(ads101x_t *const me,
 	config |= channel;
 
 	/* Set the high threshold register */
-	if (i2c_write(ADS101X_REG_POINTER_HITHRESH, threshold << me->bit_shift, me->i2c_dev) < 0) {
+	if (i2c_write(ADS101X_REG_POINTER_HITHRESH, threshold << me->bit_shift, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
 	/* Set the new ADC configuration */
-	if (i2c_write(ADS101X_REG_POINTER_CONFIG, config, me->i2c_dev) < 0) {
+	if (i2c_write(ADS101X_REG_POINTER_CONFIG, config, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
@@ -385,7 +398,7 @@ esp_err_t ads101x_get_last_conversion_results(ads101x_t *const me,
 	/* Read the conversion result */
 	uint16_t result;
 
-	if (i2c_read(ADS101X_REG_POINTER_CONVERT, &result, me->i2c_dev) < 0) {
+	if (i2c_read(ADS101X_REG_POINTER_CONVERT, &result, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
@@ -508,16 +521,16 @@ esp_err_t ads101x_start_reading(ads101x_t *const me, uint16_t mux,
 	config |= ADS101X_REG_CONFIG_OS_SINGLE;
 
 	/* Set the new ADC configuration */
-	if (i2c_write(ADS101X_REG_POINTER_CONFIG, config, me->i2c_dev) < 0) {
+	if (i2c_write(ADS101X_REG_POINTER_CONFIG, config, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
 	/* Set ALERT/RDY to RDY mode */
-	if (i2c_write(ADS101X_REG_POINTER_HITHRESH, 0x8000, me->i2c_dev) < 0) {
+	if (i2c_write(ADS101X_REG_POINTER_HITHRESH, 0x8000, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
-	if (i2c_write(ADS101X_REG_POINTER_LOWTHRESH, 0x0000, me->i2c_dev) < 0) {
+	if (i2c_write(ADS101X_REG_POINTER_LOWTHRESH, 0x0000, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
@@ -536,7 +549,7 @@ esp_err_t ads101x_conversion_complete(ads101x_t *const me, bool *is_complete) {
 	/* Check if the device is performing a conversion */
 	uint16_t rx_data = 0;
 
-	if (i2c_read(ADS101X_REG_POINTER_CONFIG, &rx_data, me->i2c_dev) < 0) {
+	if (i2c_read(ADS101X_REG_POINTER_CONFIG, &rx_data, me->ezlopi_i2c) < 0) {
 		return ESP_FAIL;
 	}
 
@@ -553,13 +566,16 @@ esp_err_t ads101x_conversion_complete(ads101x_t *const me, bool *is_complete) {
  */
 static int8_t i2c_read(uint8_t reg_addr, uint16_t *reg_data, void *intf) {
 	int8_t ret = 0;
-	i2c_bus_dev_t *dev = (i2c_bus_dev_t *)intf;
+	// i2c_bus_dev_t *dev = (i2c_bus_dev_t *)intf;
+	s_ezlopi_i2c_master_t *i2c_master_conf = (s_ezlopi_i2c_master_t *)intf;
 
 	uint8_t buf[2] = {0};
+	
+	// ret =  dev->read(&reg_addr, 1, buf, 2, dev);
+	ret = ezlopi_i2c_master_write_to_device(i2c_master_conf, &reg_addr, sizeof(reg_addr));
+	ret = ezlopi_i2c_master_read_from_device(i2c_master_conf, buf, sizeof(buf));
 
-	ret =  dev->read(&reg_addr, 1, buf, 2, dev);
-
-	if (ret < 0) {
+	if (ret != ESP_OK) {
 		return ret;
 	}
 
@@ -574,14 +590,16 @@ static int8_t i2c_read(uint8_t reg_addr, uint16_t *reg_data, void *intf) {
 static int8_t i2c_write(uint8_t reg_addr, const uint16_t reg_data,
 		                    void *intf) {
 	int8_t ret = 0;
-	i2c_bus_dev_t *dev = (i2c_bus_dev_t *)intf;
+	s_ezlopi_i2c_master_t *i2c_master_conf = (s_ezlopi_i2c_master_t *)intf;
+	// i2c_bus_dev_t *dev = (i2c_bus_dev_t *)intf;
 
-	uint8_t buf[2] = {(uint8_t)((reg_data & 0xFF00) >> 8),
+	uint8_t buf[3] = {reg_addr, (uint8_t)((reg_data & 0xFF00) >> 8),
 			(uint8_t)(reg_data & 0x00FF)};
 
-	ret = dev->write(&reg_addr, 1, buf, 2, dev);
+	// ret = dev->write(&reg_addr, 1, buf, 2, dev);
+	ret = ezlopi_i2c_master_write_to_device(i2c_master_conf, buf, sizeof(buf));
 
-	if (ret < 0) {
+	if (ret != ESP_OK) {
 		return ret;
 	}
 

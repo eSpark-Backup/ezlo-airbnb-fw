@@ -46,9 +46,14 @@ extern "C" {
 #include "ads101x.h"
 
 /* Exported macro ------------------------------------------------------------*/
-#define NH3_DEFAULT_CALIB_VALUE	420
-#define CO_DEFAULT_CALIB_VALUE	730
-#define NO2_DEFAULT_CALIB_VALUE	820
+// #define NH3_DEFAULT_CALIB_VALUE	420
+// #define CO_DEFAULT_CALIB_VALUE	730
+// #define NO2_DEFAULT_CALIB_VALUE	820
+
+// My Calib Values
+#define NH3_DEFAULT_CALIB_VALUE	149
+#define CO_DEFAULT_CALIB_VALUE	351
+#define NO2_DEFAULT_CALIB_VALUE	555
 
 /* Exported typedef ----------------------------------------------------------*/
 /* todo: write descriptions */
@@ -93,7 +98,7 @@ typedef struct {
   * @retval
   * 	- ESP_OK on success
   */
-esp_err_t mics6814_init(mics6814_t *const me, gpio_num_t int_pin, i2c_bus_t *i2c_bus);
+esp_err_t mics6814_init(mics6814_t *const me, gpio_num_t int_pin);
 
 /**
   * @brief Load calibration values for a MICS-6814 sensor instance

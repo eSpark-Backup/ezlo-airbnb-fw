@@ -59,14 +59,14 @@ static float calculate_ratio(mics6814_t *const me, mics6814_channel_e channel);
 /**
   * @brief Initialize a MiCS-6814 sensor instance
   */
-esp_err_t mics6814_init(mics6814_t *const me, gpio_num_t int_pin, i2c_bus_t *i2c_bus) {
+esp_err_t mics6814_init(mics6814_t *const me, gpio_num_t int_pin) {
 	ESP_LOGI(TAG, "Initializing MiCS-6814 instance...");
 
 	/* Variable to return error code */
 	esp_err_t ret = ESP_OK;
 
 	/* Initialize ADC */
-	ret = ads101x_init(&me->adc, ADS101X_MODEL_5, int_pin, i2c_bus, ADS101X_I2C_ADDRESS, NULL, NULL);
+	ret = ads101x_init(&me->adc, ADS101X_MODEL_5, int_pin, ADS101X_I2C_ADDRESS_VDD);
 
 	if (ret != ESP_OK) {
 		return ESP_FAIL;
@@ -112,29 +112,29 @@ float mics6814_get_gas(mics6814_t *const me, gas_e gas) {
 		case MICS6814_GAS_CO:
 			gas_value = pow(ratio1, -1.179) * 4.385;
 			break;
-    case MICS6814_GAS_NO2:
-    	gas_value = pow(ratio2, 1.007) / 6.855;
+		case MICS6814_GAS_NO2:
+			gas_value = pow(ratio2, 1.007) / 6.855;
+				break;
+		case MICS6814_GAS_NH3:
+			gas_value = pow(ratio0, -1.67) / 1.47;
 			break;
-    case MICS6814_GAS_NH3:
-    	gas_value = pow(ratio0, -1.67) / 1.47;
-    	break;
-    case MICS6814_GAS_C3H8:
-    	gas_value = pow(ratio0, -2.518) * 570.164;
+		case MICS6814_GAS_C3H8:
+			gas_value = pow(ratio0, -2.518) * 570.164;
+				break;
+			case MICS6814_GAS_C4H10:
+				gas_value = pow(ratio0, -2.138) * 398.107;
+				break;
+		case MICS6814_GAS_CH4:
+			gas_value = pow(ratio1, -4.363) * 630.957;
 			break;
-		case MICS6814_GAS_C4H10:
-			gas_value = pow(ratio0, -2.138) * 398.107;
+		case MICS6814_GAS_H2:
+			gas_value = pow(ratio1, -1.8) * 0.73;
 			break;
-    case MICS6814_GAS_CH4:
-    	gas_value = pow(ratio1, -4.363) * 630.957;
-    	break;
-    case MICS6814_GAS_H2:
-    	gas_value = pow(ratio1, -1.8) * 0.73;
-    	break;
-    case MICS6814_GAS_C2H5OH:
-    	gas_value = pow(ratio1, -1.552) * 1.622;
-    	break;
-    default:
-    	gas_value = -1;	/* Negative number for error */
+		case MICS6814_GAS_C2H5OH:
+			gas_value = pow(ratio1, -1.552) * 1.622;
+			break;
+		default:
+			gas_value = -1;	/* Negative number for error */
 			break;
 	}
 
@@ -202,9 +202,9 @@ void mics6814_calibrate(mics6814_t *const me) {
 		co_sum += co_curr - co_buf[co_ptr];
 		no2_sum += no2_curr - no2_buf[no2_ptr];
 
-		printf("nh3_sum: %ld\r\n", nh3_sum);
-		printf("co_sum: %ld\r\n", co_sum);
-		printf("no2_sum: %ld\r\n\n", no2_sum);
+		printf("nh3_sum: %u\r\n", nh3_sum);
+		printf("co_sum: %u\r\n", co_sum);
+		printf("no2_sum: %u\r\n\n", no2_sum);
 
 		/* Store new values in the buffer */
 		nh3_buf[nh3_ptr] = nh3_curr;
@@ -215,6 +215,10 @@ void mics6814_calibrate(mics6814_t *const me) {
 		nh3_is_stable = abs(nh3_sum / seconds - nh3_curr) < delta;
 		co_is_stable = abs(co_sum / seconds - co_curr) < delta;
 		no2_is_stable = abs(no2_sum / seconds - no2_curr) < delta;
+
+		printf("nh3_is_stable: %d\r\n", nh3_is_stable);
+		printf("co_is_stable: %d\r\n", co_is_stable);
+		printf("no2_is_stable: %d\r\n", no2_is_stable);
 
 		/* Pointer to a buffer */
 		nh3_ptr = (nh3_ptr + 1) % seconds;
