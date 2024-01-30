@@ -10,7 +10,9 @@
  * @url  https://github.com/DFRobot/DFRobot_ENS160
  */
 #include <DFRobot_ENS160.h>
+#include "USB.h"
 
+#define Serial USBSerial
 #define ENS_160_SDA 18
 #define ENS_160_SCL 17
 

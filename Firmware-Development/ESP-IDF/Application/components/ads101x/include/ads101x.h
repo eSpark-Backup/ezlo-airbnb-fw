@@ -54,6 +54,9 @@ extern "C" {
 #define ADS101X_I2C_ADDRESS_GND	0x48 /* ADDR pin connected to GND */
 #define ADS101X_I2C_ADDRESS_VDD	0x49 /* ADDR pin connected to VDD */
 
+#define ADS101X_I2C_SDA GPIO_NUM_18
+#define ADS101X_I2C_SCL GPIO_NUM_17
+
 /* Pointer registers */
 #define ADS101X_REG_POINTER_MASK			0x03 /* Point mask */
 #define ADS101X_REG_POINTER_CONVERT		0x00 /* Conversion */

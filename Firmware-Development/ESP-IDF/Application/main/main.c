@@ -7,8 +7,11 @@
 #include "pms5003.hpp"
 #include "mics6814.h"
 #include "ch2o_sensor.h"
+#include "ens160.h"
 
 // #define GAS_SENSOR_TEST 0
+
+static const char* TAG = "Application";
 
 bme680_fields_t gas_sensor_fields;
 ch2o_sensor_data_t ch2o_data;
@@ -25,15 +28,25 @@ void app_main()
   // mics6814_init(&adc, GPIO_NUM_0); // For Harware Interrupt
   // // mics6814_init(&adc, -1); // For Software Interrupt
   // mics6814_calibrate(&adc);
-  ch2o_sensor_init(&ch2o_data);
+  // ch2o_sensor_init(&ch2o_data);
+
+  // Init the sensor
+  if( NO_ERR != DFRobot_ENS160_I2C_begin() ){
+    ESP_LOGE(TAG, "Communication with device failed, please check connection");
+    delay(3000);
+  }
+  ESP_LOGI(TAG, "Begin ok!");
+  DFRobot_ENS160_setPWRMode(ENS160_STANDARD_MODE);
+  DFRobot_ENS160_setTempAndHum(/*temperature=*/25.0, /*humidity=*/50.0);
 
   while (1)
   {
-    if(ch2o_data.available)
-    {
-        printf("ch2o ppm : %0.2f\r\n", ch2o_data.ppm);
-        ch2o_data.available = false;
-    }
+    DFRobot_ENS160_test();
+    // if(ch2o_data.available)
+    // {
+    //     printf("ch2o ppm : %0.2f\r\n", ch2o_data.ppm);
+    //     ch2o_data.available = false;
+    // }
     
 // #if GAS_SENSOR_TEST
 //     bme680_test();

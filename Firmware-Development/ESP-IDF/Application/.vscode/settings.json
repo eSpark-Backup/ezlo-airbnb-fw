@@ -2,6 +2,11 @@
     "idf.adapterTargetName": "esp32s3",
     "files.associations": {
         "ezlopi_i2c_master.h": "c",
-        "ch20_sensor.h": "c"
+        "ch20_sensor.h": "c",
+        "xstring": "c",
+        "xutility": "c",
+        "initializer_list": "c",
+        "type_traits": "c",
+        "xmemory0": "c"
     }
 }

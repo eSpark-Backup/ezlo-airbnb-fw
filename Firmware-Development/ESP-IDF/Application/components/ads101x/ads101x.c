@@ -119,8 +119,8 @@ esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t in
         .enable = true,
         .address = dev_addr,
         .channel = I2C_NUM_0,
-        .sda = 18,
-        .scl = 17,
+        .sda = ADS101X_I2C_SDA,
+        .scl = ADS101X_I2C_SCL,
         .clock_speed = 400000,
     };
 
