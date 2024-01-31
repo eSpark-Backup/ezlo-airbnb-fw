@@ -7,6 +7,8 @@
         "xutility": "c",
         "initializer_list": "c",
         "type_traits": "c",
-        "xmemory0": "c"
+        "xmemory0": "c",
+        "ze08-ch2o.h": "c",
+        "string.h": "c"
     }
 }
