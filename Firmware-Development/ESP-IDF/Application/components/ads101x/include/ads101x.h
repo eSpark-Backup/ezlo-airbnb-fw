@@ -56,6 +56,7 @@ extern "C" {
 
 #define ADS101X_I2C_SDA GPIO_NUM_18
 #define ADS101X_I2C_SCL GPIO_NUM_17
+#define ADS101X_I2C_SPEED 400000
 
 /* Pointer registers */
 #define ADS101X_REG_POINTER_MASK			0x03 /* Point mask */
@@ -181,16 +182,10 @@ typedef struct {
  * @param me       : Pointer to a ads101x_t instance
  * @param model    : ADS101x model
  * @param int_pin  : Interrupt pin to indicate a completed ADC conversion
- * @param i2c_bus  : Pointer to a structure with the data to initialize the
- * 								   I2C device
- * @param dev_addr : I2C device address
- * @param read     : Pointer to I2C read function
- * @param write    : Pointer to I2C write function
  *
  * @return ESP_OK on success
  */
-esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin,
-		uint8_t dev_addr);
+esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin);
 
 /**
  * @brief Function that reads a specific single-ended ADC channel.

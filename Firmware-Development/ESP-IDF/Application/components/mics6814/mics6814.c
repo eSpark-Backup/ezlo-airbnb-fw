@@ -66,7 +66,7 @@ esp_err_t mics6814_init(mics6814_t *const me, gpio_num_t int_pin) {
 	esp_err_t ret = ESP_OK;
 
 	/* Initialize ADC */
-	ret = ads101x_init(&me->adc, ADS101X_MODEL_5, int_pin, ADS101X_I2C_ADDRESS_VDD);
+	ret = ads101x_init(&me->adc, ADS101X_MODEL_5, int_pin);
 
 	if (ret != ESP_OK) {
 		return ESP_FAIL;

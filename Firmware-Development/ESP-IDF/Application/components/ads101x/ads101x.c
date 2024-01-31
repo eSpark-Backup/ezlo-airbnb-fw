@@ -93,7 +93,7 @@ static void IRAM_ATTR isr_handler(void *arg);
 /**
  * @brief Function to initialize a ADS101x instance
  */
-esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin, uint8_t dev_addr) {
+esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t int_pin) {
 	/* Print initializing message */
 	ESP_LOGI(TAG, "Initializing instance...");
 
@@ -115,18 +115,8 @@ esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t in
 	// 	ESP_LOGE(TAG, "Failed to add device");
 	// 	return ret;
 	// }
-	s_ezlopi_i2c_master_t ads101x_i2c_master_conf = {
-        .enable = true,
-        .address = dev_addr,
-        .channel = I2C_NUM_0,
-        .sda = ADS101X_I2C_SDA,
-        .scl = ADS101X_I2C_SCL,
-        .clock_speed = 400000,
-    };
 
-	ezlopi_i2c_master_init(&ads101x_i2c_master_conf);
-	me->ezlopi_i2c = (s_ezlopi_i2c_master_t*) malloc(sizeof(s_ezlopi_i2c_master_t));
-	memcpy(me->ezlopi_i2c, &ads101x_i2c_master_conf, sizeof(s_ezlopi_i2c_master_t));
+	ezlopi_i2c_master_init(me->ezlopi_i2c);
 
 	/**/
 	// me->i2c_dev = &i2c_bus->devs.dev[i2c_bus->devs.num - 1]; /* todo: write function to get the dev from name */

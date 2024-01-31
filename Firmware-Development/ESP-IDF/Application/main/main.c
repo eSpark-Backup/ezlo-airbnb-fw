@@ -11,8 +11,8 @@
 
 // #define GAS_SENSOR_TEST 0
 // #define GAS_SENSOR_TEST 0
-// #define GAS_SENSOR_TEST 0
-#define ZE08_CH2O_SENSOR 1
+#define MICS6814_SENSOR 1
+#define ZE08_CH2O_SENSOR 0
 
 static const char *TAG = "Application";
 bme680_fields_t gas_sensor_fields;
@@ -27,10 +27,19 @@ void app_main(void)
     // bme680_setup(gas_sensor_fields.precision);
     // PM25_AQI_Data data;
     // pms_init(&data);
-    // mics6814_t adc;
-    // mics6814_init(&adc, GPIO_NUM_0); // For Harware Interrupt
-    // // mics6814_init(&adc, -1); // For Software Interrupt
-    // mics6814_calibrate(&adc);
+#if MICS6814_SENSOR
+    mics6814_t mics6814;
+    mics6814.adc.ezlopi_i2c = (s_ezlopi_i2c_master_t*) malloc(sizeof(s_ezlopi_i2c_master_t));
+    mics6814.adc.ezlopi_i2c->enable = true;
+    mics6814.adc.ezlopi_i2c->address = ADS101X_I2C_ADDRESS_VDD;
+    mics6814.adc.ezlopi_i2c->channel = I2C_NUM_0;
+    mics6814.adc.ezlopi_i2c->sda = ADS101X_I2C_SDA;
+    mics6814.adc.ezlopi_i2c->scl = ADS101X_I2C_SCL;
+    mics6814.adc.ezlopi_i2c->clock_speed = ADS101X_I2C_SPEED;
+    mics6814_init(&mics6814, GPIO_NUM_0); // For Harware Interrupt
+    // // mics6814_init(&mics6814, -1); // For Software Interrupt
+    mics6814_calibrate(&mics6814);
+#endif
 #if ZE08_CH2O_SENSOR
     s_ezlopi_uart_t ze08_uart_config =
     {
@@ -72,9 +81,9 @@ void app_main(void)
         //       printf("Approx. Altitude = %0.2f m\n\n", gas_sensor_fields.altitude);
         //     }
         // #endif
-        // float no2 = mics6814_get_gas(&adc, MICS6814_CH_NO2);
-        // float nh3 = mics6814_get_gas(&adc, MICS6814_CH_NH3);
-        // float co = mics6814_get_gas(&adc, MICS6814_CH_CO);
+        // float no2 = mics6814_get_gas(&mics6814, MICS6814_CH_NO2);
+        // float nh3 = mics6814_get_gas(&mics6814, MICS6814_CH_NH3);
+        // float co = mics6814_get_gas(&mics6814, MICS6814_CH_CO);
         // printf("NO2 = %0.2f\n", no2);
         // printf("NH3 = %0.2f\n", nh3);
         // printf("CO = %0.2f\n", co);
