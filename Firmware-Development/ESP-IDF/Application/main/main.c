@@ -10,8 +10,8 @@
 #include "ens160.h"
 
 // #define GAS_SENSOR_TEST 0
-// #define GAS_SENSOR_TEST 0
-#define MICS6814_SENSOR 1
+#define ENS_160_SENSOR 1
+#define MICS6814_SENSOR 0
 #define ZE08_CH2O_SENSOR 0
 
 static const char *TAG = "Application";
@@ -50,17 +50,32 @@ void app_main(void)
     };
     ze08_ch2o_sensor_init(&ze08_uart_config, &ze08_ch2o_data);
 #endif
+
+#if ENS_160_SENSOR
+    ens160_t ens160_sensor;
+    ens160_sensor.ezlopi_i2c = (s_ezlopi_i2c_master_t*) malloc(sizeof(s_ezlopi_i2c_master_t));
+    ens160_sensor.ezlopi_i2c->enable = true;
+    ens160_sensor.ezlopi_i2c->address = ENS160_I2C_ADDRESS;
+    ens160_sensor.ezlopi_i2c->channel = I2C_NUM_0;
+    ens160_sensor.ezlopi_i2c->sda = ENS160_I2C_SDA;
+    ens160_sensor.ezlopi_i2c->scl = ENS160_I2C_SCL;
+    ens160_sensor.ezlopi_i2c->clock_speed = ENS160_I2C_SPEED;
     // Init the sensor
-    // if( NO_ERR != DFRobot_ENS160_I2C_begin() ){
-    //   ESP_LOGE(TAG, "Communication with device failed, please check connection");
-    //   delay(3000);
-    // }
-    // ESP_LOGI(TAG, "Begin ok!");
-    // DFRobot_ENS160_setPWRMode(ENS160_STANDARD_MODE);
-    // DFRobot_ENS160_setTempAndHum(/*temperature=*/25.0, /*humidity=*/50.0);
+    if( NO_ERR != dfrobot_ens160_i2c_begin(&ens160_sensor) ){
+      ESP_LOGE(TAG, "Communication with device failed, please check connection");
+      delay(3000);
+    }
+    ESP_LOGI(TAG, "Begin ok!");
+    dfrobot_ens160_set_pwr_mode(&ens160_sensor, ENS160_STANDARD_MODE);
+    dfrobot_ens160_set_temp_and_hum(&ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0);
+#endif
+
     while (1)
     {
-    // DFRobot_ENS160_test();
+#if ENS_160_SENSOR
+        dfrobot_ens160_get_data(&ens160_sensor);
+#endif
+
 #if ZE08_CH2O_SENSOR
         if (ze08_ch2o_data.available)
         {
