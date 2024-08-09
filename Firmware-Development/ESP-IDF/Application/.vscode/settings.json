@@ -10,5 +10,7 @@
         "xmemory0": "c",
         "ze08-ch2o.h": "c",
         "string.h": "c"
-    }
+    },
+    "idf.portWin": "COM6",
+    "idf.flashType": "UART"
 }
