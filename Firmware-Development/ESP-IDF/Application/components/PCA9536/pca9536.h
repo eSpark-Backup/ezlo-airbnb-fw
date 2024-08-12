@@ -21,24 +21,29 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#pragma once 
 
-#if (ARDUINO >= 100)
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <stdio.h>
+#include <stdbool.h>
+#include <ezlopi_i2c_master.h>
 
-#define DEBUG_PCA9536
-
-#include <Wire.h>
-
-//  Valid PCA9536 addresses
 typedef enum
 {
     PCA9536_ADDRESS = 0x41,
     PCA9536_ADDRESS_INVALID = 0xFF
 } PCA9536_Address_t;
+
+typedef enum
+{
+    INPUT,
+    OUTPUT
+} PCA9536_Direction_t;
+
+typedef enum
+{
+    LOW,
+    HIGH
+} PCA9536_State_t;
 
 // PCA9536 registers:
 typedef enum
@@ -59,7 +64,6 @@ typedef enum
     PCA9536_ERROR_UNDEFINED = -1,
     PCA9536_ERROR_SUCCESS = 1
 } PCA9536_error_t;
-const PCA9536_error_t PCA9536_SUCCESS = PCA9536_ERROR_SUCCESS;
 
 // PCA9536 invert/normal values:
 typedef enum
@@ -81,43 +85,30 @@ enum
 // PCA9536 has four GPIO pins: 0-3
 #define PCA9536_MAX_GPIO 3
 
-class PCA9536
-{
-public:
-    PCA9536();
+bool pca9536_init(s_ezlopi_i2c_master_t *i2c_master_conf);
+bool pca9536_begin();
+bool pca9536_is_connected();
 
-    bool begin(TwoWire &wirePort = Wire);
-    bool isConnected();
+// pinMode can set a pin (0-3) to INPUT or OUTPUT
+PCA9536_error_t pca9536_pin_mode(uint8_t pin, uint8_t mode);
 
-    // setDebugStream to enable library debug statements
-    void setDebugStream(Stream &debugPort = Serial);
+// digitalWrite and write can be used to set a pin HIGH or LOW
+PCA9536_error_t pca9536_digital_write(uint8_t pin, uint8_t value);
+PCA9536_error_t pca9536_write(uint8_t pin, uint8_t value);
 
-    // pinMode can set a pin (0-3) to INPUT or OUTPUT
-    PCA9536_error_t pinMode(uint8_t pin, uint8_t mode);
+// readReg can be used to read the whole input register (4 bits)
+uint8_t pca9536_read_reg();
 
-    // digitalWrite and write can be used to set a pin HIGH or LOW
-    PCA9536_error_t digitalWrite(uint8_t pin, uint8_t value);
-    PCA9536_error_t write(uint8_t pin, uint8_t value);
+// digitalRead and read can be used to read a pin (0-3)
+uint8_t pca9536_digital_read(uint8_t pin);
+uint8_t pca9536_read(uint8_t pin);
 
-    // readReg can be used to read the whole input register (4 bits)
-    uint8_t readReg();
+// invert and revert can be used to invert (or not) the I/O logic during a read
+PCA9536_error_t pca9536_invert(uint8_t pin, PCA9536_invert_t inversion); // inversion = PCA9536_INVERT
+PCA9536_error_t pca9536_revert(uint8_t pin);
 
-    // digitalRead and read can be used to read a pin (0-3)
-    uint8_t digitalRead(uint8_t pin);
-    uint8_t read(uint8_t pin);
-
-    // invert and revert can be used to invert (or not) the I/O logic during a read
-    PCA9536_error_t invert(uint8_t pin, PCA9536_invert_t inversion = PCA9536_INVERT);
-    PCA9536_error_t revert(uint8_t pin);
-
-private:
-    TwoWire *_i2cPort; //The generic connection to user's chosen I2C hardware
-    Stream *_debugPort;
-    PCA9536_Address_t _deviceAddress;
-
-    // I2C Read/Write
-    PCA9536_error_t readI2CBuffer(uint8_t *dest, PCA9536_REGISTER_t startRegister, uint16_t len);
-    PCA9536_error_t writeI2CBuffer(uint8_t *src, PCA9536_REGISTER_t startRegister, uint16_t len);
-    PCA9536_error_t readI2CRegister(uint8_t *dest, PCA9536_REGISTER_t registerAddress);
-    PCA9536_error_t writeI2CRegister(uint8_t data, PCA9536_REGISTER_t registerAddress);
-};
+// I2C Read/Write
+PCA9536_error_t pca9536_read_i2c_buffer(uint8_t *dest, PCA9536_REGISTER_t startRegister, uint16_t len);
+PCA9536_error_t pca9536_write_i2c_buffer(uint8_t *src, PCA9536_REGISTER_t startRegister, uint16_t len);
+PCA9536_error_t pca9536_read_i2c_register(uint8_t *dest, PCA9536_REGISTER_t registerAddress);
+PCA9536_error_t pca9536_write_i2c_register(uint8_t data, PCA9536_REGISTER_t registerAddress);

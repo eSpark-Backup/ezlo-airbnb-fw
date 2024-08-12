@@ -21,54 +21,32 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <SparkFun_PCA9536_Arduino_Library.h>
+#include <pca9536.h>
+#include <ezlopi_i2c_master.h>
 
-#ifdef DEBUG_PCA9536
-#define PCA9536_DEBUG(x)      \
-    if (_debugPort != NULL)   \
-    {                         \
-        _debugPort->print(x); \
-    }
-#define PCA9536_DEBUGLN(x)      \
-    if (_debugPort != NULL)     \
-    {                           \
-        _debugPort->println(x); \
-    }
-#define STORAGE(x) (x)
-#else
-#define PCA9536_DEBUG(x)
-#define PCA9536_DEBUGLN(x)
-#define STORAGE(x) (x)
-#endif
+static s_ezlopi_i2c_master_t *g_i2c_master_conf = NULL;
 
-PCA9536::PCA9536()
+bool pca9536_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
-    _i2cPort = NULL;
-    _debugPort = NULL;
-    _deviceAddress = PCA9536_ADDRESS_INVALID;
+    g_i2c_master_conf = i2c_master_conf;
+    return ezlopi_i2c_master_init(i2c_master_conf);
 }
 
-bool PCA9536::begin(TwoWire &wirePort)
+bool pca9536_begin()
 {
-    _deviceAddress = PCA9536_ADDRESS;
-    _i2cPort = &wirePort;
-
-    return (isConnected());
+    return pca9536_is_connected();
 }
 
 //Returns true if a device ack's at given address
-boolean PCA9536::isConnected(void)
+bool pca9536_is_connected(void)
 {
-    _i2cPort->beginTransmission((uint8_t)_deviceAddress);
-    return (_i2cPort->endTransmission() == 0);
+    uint8_t dummy_data;
+    esp_err_t result = ezlopi_i2c_master_read_from_device(g_i2c_master_conf, &dummy_data, 1);
+    
+    return !result; // ESP_OK to True
 }
 
-void PCA9536::setDebugStream(Stream &debugPort)
-{
-    _debugPort = &debugPort;
-}
-
-PCA9536_error_t PCA9536::pinMode(uint8_t pin, uint8_t mode)
+PCA9536_error_t pca9536_pin_mode(uint8_t pin, uint8_t mode)
 {
     PCA9536_error_t err;
     uint8_t cfgRegister = 0;
@@ -76,7 +54,7 @@ PCA9536_error_t PCA9536::pinMode(uint8_t pin, uint8_t mode)
     if (pin > PCA9536_MAX_GPIO)
         return PCA9536_ERROR_UNDEFINED;
 
-    err = readI2CRegister(&cfgRegister, PCA9536_REGISTER_CONFIGURATION);
+    err = pca9536_read_i2c_register(&cfgRegister, PCA9536_REGISTER_CONFIGURATION);
     if (err != PCA9536_ERROR_SUCCESS)
     {
         return err;
@@ -86,10 +64,10 @@ PCA9536_error_t PCA9536::pinMode(uint8_t pin, uint8_t mode)
     {
         cfgRegister |= (1 << pin);
     }
-    return writeI2CRegister(cfgRegister, PCA9536_REGISTER_CONFIGURATION);
+    return pca9536_write_i2c_register(cfgRegister, PCA9536_REGISTER_CONFIGURATION);
 }
 
-PCA9536_error_t PCA9536::write(uint8_t pin, uint8_t value)
+PCA9536_error_t pca9536_write(uint8_t pin, uint8_t value)
 {
     PCA9536_error_t err;
     uint8_t outputRegister = 0;
@@ -97,7 +75,7 @@ PCA9536_error_t PCA9536::write(uint8_t pin, uint8_t value)
     if (pin > PCA9536_MAX_GPIO)
         return PCA9536_ERROR_UNDEFINED;
 
-    err = readI2CRegister(&outputRegister, PCA9536_REGISTER_OUTPUT_PORT);
+    err = pca9536_read_i2c_register(&outputRegister, PCA9536_REGISTER_OUTPUT_PORT);
     if (err != PCA9536_ERROR_SUCCESS)
     {
         return err;
@@ -108,20 +86,20 @@ PCA9536_error_t PCA9536::write(uint8_t pin, uint8_t value)
     {
         outputRegister |= (1 << pin);
     }
-    return writeI2CRegister(outputRegister, PCA9536_REGISTER_OUTPUT_PORT);
+    return pca9536_write_i2c_register(outputRegister, PCA9536_REGISTER_OUTPUT_PORT);
 }
 
-PCA9536_error_t PCA9536::digitalWrite(uint8_t pin, uint8_t value)
+PCA9536_error_t pca9536_digital_write(uint8_t pin, uint8_t value)
 {
-    return write(pin, value);
+    return pca9536_write(pin, value);
 }
 
-uint8_t PCA9536::readReg()
+uint8_t pca9536_read_reg()
 {
     PCA9536_error_t err;
     uint8_t inputRegister = 0;
 
-    err = readI2CRegister(&inputRegister, PCA9536_REGISTER_INPUT_PORT);
+    err = pca9536_read_i2c_register(&inputRegister, PCA9536_REGISTER_INPUT_PORT);
     if (err != PCA9536_ERROR_SUCCESS)
     {
         return err;
@@ -129,7 +107,7 @@ uint8_t PCA9536::readReg()
     return (inputRegister & (0x0f));
 }
 
-uint8_t PCA9536::read(uint8_t pin)
+uint8_t pca9536_read(uint8_t pin)
 {
     PCA9536_error_t err;
     uint8_t inputRegister = 0;
@@ -137,7 +115,7 @@ uint8_t PCA9536::read(uint8_t pin)
     if (pin > PCA9536_MAX_GPIO)
         return PCA9536_ERROR_UNDEFINED;
 
-    err = readI2CRegister(&inputRegister, PCA9536_REGISTER_INPUT_PORT);
+    err = pca9536_read_i2c_register(&inputRegister, PCA9536_REGISTER_INPUT_PORT);
     if (err != PCA9536_ERROR_SUCCESS)
     {
         return err;
@@ -145,12 +123,12 @@ uint8_t PCA9536::read(uint8_t pin)
     return (inputRegister & (1 << pin)) >> pin;
 }
 
-uint8_t PCA9536::digitalRead(uint8_t pin)
+uint8_t pca9536_digital_read(uint8_t pin)
 {
-    return read(pin);
+    return pca9536_read(pin);
 }
 
-PCA9536_error_t PCA9536::invert(uint8_t pin, PCA9536_invert_t inversion)
+PCA9536_error_t pca9536_invert(uint8_t pin, PCA9536_invert_t inversion)
 {
     PCA9536_error_t err;
     uint8_t invertRegister = 0;
@@ -158,7 +136,7 @@ PCA9536_error_t PCA9536::invert(uint8_t pin, PCA9536_invert_t inversion)
     if (pin > PCA9536_MAX_GPIO)
         return PCA9536_ERROR_UNDEFINED;
 
-    err = readI2CRegister(&invertRegister, PCA9536_REGISTER_POLARITY_INVERSION);
+    err = pca9536_read_i2c_register(&invertRegister, PCA9536_REGISTER_POLARITY_INVERSION);
     if (err != PCA9536_ERROR_SUCCESS)
     {
         return err;
@@ -169,67 +147,83 @@ PCA9536_error_t PCA9536::invert(uint8_t pin, PCA9536_invert_t inversion)
     {
         invertRegister |= (1 << pin);
     }
-    return writeI2CRegister(invertRegister, PCA9536_REGISTER_POLARITY_INVERSION);
+    return pca9536_write_i2c_register(invertRegister, PCA9536_REGISTER_POLARITY_INVERSION);
 }
 
-PCA9536_error_t PCA9536::revert(uint8_t pin)
+PCA9536_error_t pca9536_revert(uint8_t pin)
 {
-    return invert(pin, PCA9536_RETAIN);
+    return pca9536_invert(pin, PCA9536_RETAIN);
 }
 
-PCA9536_error_t PCA9536::readI2CBuffer(uint8_t *dest, PCA9536_REGISTER_t startRegister, uint16_t len)
+PCA9536_error_t pca9536_read_i2c_buffer(uint8_t *dest, PCA9536_REGISTER_t startRegister, uint16_t len)
 {
-    PCA9536_DEBUGLN((STORAGE("(readI2CBuffer): read ") + String(len) +
-                     STORAGE(" @ 0x") + String(startRegister, HEX)));
-    if (_deviceAddress == PCA9536_ADDRESS_INVALID)
+    // PCA9536_DEBUGLN((STORAGE("(readI2CBuffer): read ") + String(len) +
+    //                  STORAGE(" @ 0x") + String(startRegister, HEX)));
+    if (g_i2c_master_conf->address == PCA9536_ADDRESS_INVALID)
     {
-        PCA9536_DEBUGLN(STORAGE("    ERR (readI2CBuffer): Invalid address"));
+        // PCA9536_DEBUGLN(STORAGE("    ERR (readI2CBuffer): Invalid address"));
         return PCA9536_ERROR_INVALID_ADDRESS;
     }
-    _i2cPort->beginTransmission((uint8_t)_deviceAddress);
-    _i2cPort->write(startRegister);
-    if (_i2cPort->endTransmission(false) != 0)
+
+    esp_err_t ret =  ezlopi_i2c_master_write_to_device(g_i2c_master_conf, (uint8_t*) &startRegister, 1);
+    // _i2cPort->beginTransmission((uint8_t)_deviceAddress);
+    // _i2cPort->write(startRegister);
+    if (ret != ESP_OK)
     {
-        PCA9536_DEBUGLN(STORAGE("    ERR (readI2CBuffer): End transmission"));
+        // PCA9536_DEBUGLN(STORAGE("    ERR (readI2CBuffer): End transmission"));
         return PCA9536_ERROR_READ;
     }
 
-    _i2cPort->requestFrom((uint8_t)_deviceAddress, (uint8_t)len);
-    for (int i = 0; i < len; i++)
-    {
-        dest[i] = _i2cPort->read();
-        PCA9536_DEBUGLN((STORAGE("    ") + String(i) + STORAGE(": 0x") + String(dest[i], HEX)));
-    }
+    ret = ezlopi_i2c_master_read_from_device(g_i2c_master_conf, dest, len);
+    // _i2cPort->requestFrom((uint8_t)_deviceAddress, (uint8_t)len);
+    // for (int i = 0; i < len; i++)
+    // {
+    //     dest[i] = _i2cPort->read();
+    //     // PCA9536_DEBUGLN((STORAGE("    ") + String(i) + STORAGE(": 0x") + String(dest[i], HEX)));
+    // }
 
     return PCA9536_ERROR_SUCCESS;
 }
 
-PCA9536_error_t PCA9536::writeI2CBuffer(uint8_t *src, PCA9536_REGISTER_t startRegister, uint16_t len)
+PCA9536_error_t pca9536_write_i2c_buffer(uint8_t *src, PCA9536_REGISTER_t startRegister, uint16_t len)
 {
-    if (_deviceAddress == PCA9536_ADDRESS_INVALID)
+    if (g_i2c_master_conf->address == PCA9536_ADDRESS_INVALID)
     {
-        PCA9536_DEBUGLN(STORAGE("ERR (readI2CBuffer): Invalid address"));
+        // PCA9536_DEBUGLN(STORAGE("ERR (readI2CBuffer): Invalid address"));
         return PCA9536_ERROR_INVALID_ADDRESS;
     }
-    _i2cPort->beginTransmission((uint8_t)_deviceAddress);
-    _i2cPort->write(startRegister);
-    for (int i = 0; i < len; i++)
+    uint8_t* buffer = malloc(len + 1);
+    buffer[0] = startRegister;
+    for (size_t i = 0; i < len; i++)
     {
-        _i2cPort->write(src[i]);
+        buffer[i+1] = src[i];
     }
-    if (_i2cPort->endTransmission(true) != 0)
+    
+    esp_err_t ret =  ezlopi_i2c_master_write_to_device(g_i2c_master_conf, buffer, len + 1);
+    if (ret != ESP_OK)
     {
         return PCA9536_ERROR_WRITE;
     }
+
+    // _i2cPort->beginTransmission((uint8_t)_deviceAddress);
+    // _i2cPort->write(startRegister);
+    // for (int i = 0; i < len; i++)
+    // {
+    //     _i2cPort->write(src[i]);
+    // }
+    // if (_i2cPort->endTransmission(true) != 0)
+    // {
+    //     return PCA9536_ERROR_WRITE;
+    // }
     return PCA9536_ERROR_SUCCESS;
 }
 
-PCA9536_error_t PCA9536::readI2CRegister(uint8_t *dest, PCA9536_REGISTER_t registerAddress)
+PCA9536_error_t pca9536_read_i2c_register(uint8_t *dest, PCA9536_REGISTER_t registerAddress)
 {
-    return readI2CBuffer(dest, registerAddress, 1);
+    return pca9536_read_i2c_buffer(dest, registerAddress, 1);
 }
 
-PCA9536_error_t PCA9536::writeI2CRegister(uint8_t data, PCA9536_REGISTER_t registerAddress)
+PCA9536_error_t pca9536_write_i2c_register(uint8_t data, PCA9536_REGISTER_t registerAddress)
 {
-    return writeI2CBuffer(&data, registerAddress, 1);
+    return pca9536_write_i2c_buffer(&data, registerAddress, 1);
 }

@@ -8,11 +8,13 @@
 #include "mics6814.h"
 #include "ze08-ch2o.h"
 #include "ens160.h"
+#include "shtc3.h"
+#include "pca9536.h"
 
 // #define GAS_SENSOR_TEST 0
 #define ENS_160_SENSOR 0
 #define MICS6814_SENSOR 0
-#define ZE08_CH2O_SENSOR 1
+#define ZE08_CH2O_SENSOR 0
 
 static const char *TAG = "Application";
 bme680_fields_t gas_sensor_fields;
@@ -69,9 +71,34 @@ void app_main(void)
     dfrobot_ens160_set_pwr_mode(&ens160_sensor, ENS160_STANDARD_MODE);
     dfrobot_ens160_set_temp_and_hum(&ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0);
 #endif
+    s_ezlopi_i2c_master_t spi_handle = {
+        .enable = true,
+        .address = PCA9536_ADDRESS,
+        .clock_speed = 100000,
+        .sda = 18,
+        .scl = 17,
+    };
+    pca9536_init(&spi_handle);
+
+    if (!pca9536_begin()){
+        while (1);
+        
+    }
+    pca9536_pin_mode(0, INPUT);
+    pca9536_pin_mode(1, OUTPUT);
+
+    // pca9536_digital_write(1, HIGH);
+    // vTaskDelay(2000 / portTICK_RATE_MS);
+    // pca9536_digital_write(1, LOW);
+    // shtc3_init_sensor(&spi_handle);
+    // shtc3_wakeup_sensor(&spi_handle);
 
     while (1)
     {
+        printf("Value = %d\r\n", pca9536_digital_read(0));
+        // float temperature, humidity;
+        // shtc3_read_out(&spi_handle, &temperature, &humidity);
+        // printf("temperature : %0.2f, humidity : %0.2f\r\n", temperature, humidity);
 #if ENS_160_SENSOR
         dfrobot_ens160_get_data(&ens160_sensor);
 #endif
