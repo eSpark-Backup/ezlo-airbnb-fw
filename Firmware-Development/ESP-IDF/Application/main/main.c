@@ -12,7 +12,7 @@
 #include "pca9536.h"
 
 // #define GAS_SENSOR_TEST 0
-#define ENS_160_SENSOR 0
+#define ENS_160_SENSOR 1
 #define MICS6814_SENSOR 0
 #define ZE08_CH2O_SENSOR 0
 
@@ -85,7 +85,7 @@ void app_main(void)
         
     }
     pca9536_pin_mode(0, INPUT);
-    pca9536_pin_mode(1, OUTPUT);
+    // pca9536_pin_mode(1, OUTPUT);
 
     // pca9536_digital_write(1, HIGH);
     // vTaskDelay(2000 / portTICK_RATE_MS);
