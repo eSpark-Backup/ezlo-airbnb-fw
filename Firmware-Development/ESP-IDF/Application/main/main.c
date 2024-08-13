@@ -12,7 +12,7 @@
 #include "pca9536.h"
 
 // #define GAS_SENSOR_TEST 0
-#define ENS_160_SENSOR 1
+#define ENS_160_SENSOR 0
 #define MICS6814_SENSOR 0
 #define ZE08_CH2O_SENSOR 0
 

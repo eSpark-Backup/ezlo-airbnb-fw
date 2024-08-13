@@ -168,7 +168,7 @@ static int __prepare(void* arg, void* user_arg)
             if (ze08_ch2o_sensor_device)
             {
                 ret = 1;
-                memset(ze08_ch2o_sensor_device, 0, sizeof(l_ezlopi_device_t));
+                // memset(ze08_ch2o_sensor_device, 0, sizeof(l_ezlopi_device_t));
                 __prepare_ze08_ch2o_sensor_device_cloud_properties(ze08_ch2o_sensor_device);
                 l_ezlopi_item_t* ze08_ch02_ppm_item = ezlopi_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
                 if (ze08_ch02_ppm_item)

@@ -487,15 +487,15 @@ int pms5003_sensor_preapre_devices_and_items(cJSON *cj_properties, uint32_t *par
     if (pms_object)
     {
         pms5003_set_pms_object_details(cj_properties, pms_object);
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cj_properties, parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
-        ESP_ERROR_CHECK(__prepare_particulate_matter_standard_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object));
+        __prepare_particulate_matter_particles_0_dot_3_um_device_and_items(cj_properties, parent_id, (void *)pms_object);            
+        __prepare_particulate_matter_particles_0_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_particles_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_standard_particles_1_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_standard_particles_2_dot_5_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
+        __prepare_particulate_matter_standard_particles_10_um_device_and_items(cj_properties, *parent_id, (void *)pms_object);
         ret = 0;
     }
     else
