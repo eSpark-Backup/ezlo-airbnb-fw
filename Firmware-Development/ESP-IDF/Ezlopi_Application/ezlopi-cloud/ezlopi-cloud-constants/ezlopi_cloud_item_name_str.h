@@ -38,7 +38,7 @@ extern const char *ezlopi_item_name_heat_alarm;
 extern const char *ezlopi_item_name_light_alarm;
 // extern const  char *ezlopi_item_name_light_color_transition;
 extern const char *ezlopi_item_name_temperature_changes;
-// extern const  char *ezlopi_item_name_intrusion_alarm;
+extern const char *ezlopi_item_name_intrusion_alarm;
 // extern const  char *ezlopi_item_name_tampering_cover_alarm;
 // extern const  char *ezlopi_item_name_glass_breakage_alarm;
 // extern const  char *ezlopi_item_name_tampering_move_alarm;
@@ -152,7 +152,7 @@ extern const char *ezlopi_item_name_temp;
 // extern const  char *ezlopi_item_name_user_lock_operation;
 // extern const  char *ezlopi_item_name_user_code_action;
 // extern const  char *ezlopi_item_name_user_codes_scan_progress;
-// extern const  char *ezlopi_item_name_velocity;
+extern const  char *ezlopi_item_name_velocity;
 extern const char *ezlopi_item_name_voltage;
 extern const char *ezlopi_item_name_current;
 extern const char *ezlopi_item_name_weight;
@@ -250,5 +250,6 @@ extern const char *ezlopi_item_name_particles_1_um;
 extern const char *ezlopi_item_name_particles_2_dot_5_um;
 extern const char *ezlopi_item_name_particles_5_um;
 extern const char *ezlopi_item_name_particles_10_um;
+extern const char *ezlopi_item_name_presence;
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

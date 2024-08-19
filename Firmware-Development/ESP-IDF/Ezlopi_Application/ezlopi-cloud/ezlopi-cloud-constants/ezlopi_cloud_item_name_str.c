@@ -38,7 +38,7 @@ const char *ezlopi_item_name_heat_alarm = "heat_alarm";
 const char *ezlopi_item_name_light_alarm = "light_alarm";
 // const  char *ezlopi_item_name_light_color_transition = "light_color_transition";
 const char *ezlopi_item_name_temperature_changes = "temperature_changes";
-// const  char *ezlopi_item_name_intrusion_alarm = "intrusion_alarm";
+const char *ezlopi_item_name_intrusion_alarm = "intrusion_alarm";
 // const  char *ezlopi_item_name_tampering_cover_alarm = "tampering_cover_alarm";
 // const  char *ezlopi_item_name_glass_breakage_alarm = "glass_breakage_alarm";
 // const  char *ezlopi_item_name_tampering_move_alarm = "tampering_move_alarm";
@@ -250,5 +250,7 @@ const char *ezlopi_item_name_particles_1_um = "particles_1_um";
 const char *ezlopi_item_name_particles_2_dot_5_um = "particles_2_dot_5_um";
 const char *ezlopi_item_name_particles_5_um = "particles_5_um";
 const char *ezlopi_item_name_particles_10_um = "particles_10_um";
+const char *ezlopi_item_name_presence = "presence";
+const char *ezlopi_item_name_velocity = "velocity";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

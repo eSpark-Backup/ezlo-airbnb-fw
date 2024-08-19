@@ -43,6 +43,7 @@ const char *scales_milli_gram_per_liter = "milli_gram_per_liter";
 
 /// @brief angle
 const char *scales_north_pole_degress = "north_pole_degress";
+const char *scales_elevation_degrees = "elevation_degrees";
 
 /// @brief volume_flow
 const char *scales_cubic_meter_per_hour = "cubic_meter_per_hour";

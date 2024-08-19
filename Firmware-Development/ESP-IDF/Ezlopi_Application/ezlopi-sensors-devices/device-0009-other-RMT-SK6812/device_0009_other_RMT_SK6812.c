@@ -195,7 +195,7 @@ static int __init(l_ezlopi_item_t* item)
                 if (0 == dimmer_args->sk6812_led_strip_initialized)
                 {
                     dimmer_args->sk6812_strip.type = LED_STRIP_SK6812;
-                    dimmer_args->sk6812_strip.length = 1;
+                    dimmer_args->sk6812_strip.length = 4;
                     dimmer_args->sk6812_strip.gpio = item->interface.pwm.gpio_num;
                     dimmer_args->sk6812_strip.buf = NULL;
                     dimmer_args->sk6812_strip.brightness = 255;

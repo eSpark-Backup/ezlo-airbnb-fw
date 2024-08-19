@@ -43,6 +43,7 @@ extern const char *scales_milli_gram_per_liter;
 
 /// @brief angle
 extern const char *scales_north_pole_degress;
+extern const char *scales_elevation_degrees;
 
 /// @brief volume_flow
 extern const char *scales_cubic_meter_per_hour;

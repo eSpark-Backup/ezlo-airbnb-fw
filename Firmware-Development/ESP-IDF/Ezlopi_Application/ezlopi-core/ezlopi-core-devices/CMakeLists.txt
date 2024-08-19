@@ -88,6 +88,8 @@ set(EZLOPI_SENSOR_DEVICE_COMPONENTS
         sensor-0069-UART-ze08-ch02-gas-sensor
 
         sensor-0070-ADC-dummy-potentiometer
+        sensor-0097-presence-sensor
+        sensor-0098-I2C-tamper-switch
         sensor-0099-SHTC3-temp-humidity
 )
 

@@ -72,5 +72,7 @@
 #include "sensor_0069_ze08_ch02_gas_sensor.h"
 
 #include "sensor_0070_ADC_dummy_potentiometer.h"
+#include "sensor_0097_presence_sensor.h"
+#include "sensor-0098-I2C-tamper-switch.h"
 #include "sensor_0099_SHTC3_temp_humidity.h"
 #endif // _EZLOPI_CORE_DEVICES_LIST_INCLUDES_H_

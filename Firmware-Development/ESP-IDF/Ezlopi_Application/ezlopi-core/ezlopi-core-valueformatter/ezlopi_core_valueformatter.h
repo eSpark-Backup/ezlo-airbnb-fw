@@ -2,7 +2,8 @@
 #define EZLOPI_VALUEFORMATER_H
 
 #include <stdbool.h>
-#include "cjext.h"
+// #include "cjext.h"
+typedef struct cJSON cJSON;
 
 void ezlopi_valueformatter_bool_to_cjson(cJSON* cj_root, bool value, const char * scale);
 void ezlopi_valueformatter_float_to_cjson(cJSON* cj_root, float value, const char * scale);

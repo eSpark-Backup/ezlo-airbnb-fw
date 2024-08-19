@@ -265,6 +265,14 @@ EZLOPI_DEVICE_LIST("sensor-ze08-ch02-gas-sensor         ", 69, sensor_0069_ze08_
 EZLOPI_DEVICE_LIST("sensor-dummy-potentiometer-ADC      ", 70, sensor_0070_ADC_dummy_potentiometer)
 #endif // SENSOR_0070_ADC_DUMMY_POTENTIOMETER
 
+#if (1 == SENSOR_0097_PRESENCE_SENSOR)
+EZLOPI_DEVICE_LIST("presence_sensor_v3                   ", 97, presence_sensor_v3)
+#endif // SENSOR_0097_PRESENCE_SENSOR
+
+#if (1 == SENSOR_0098_I2C_TAMPER_SWITCH)
+EZLOPI_DEVICE_LIST("sensor_0098_I2C_tamper_switch      ", 98, sensor_0098_I2C_tamper_switch)
+#endif // SENSOR_0098_I2C_TAMPER_SWITCH
+
 #if (1 == SENSOR_0099_SHTC3_TEMP_HUMIDITY)
 EZLOPI_DEVICE_LIST("sensor_0099_SHTC3_temp_humidity      ", 99, sensor_0099_SHTC3_temp_humidity)
 #endif // SENSOR_0099_SHTC3_TEMP_HUMIDITY

@@ -30,7 +30,20 @@
 
 static void __device_loop(void * arg);
 static void ezlopi_initialize_devices_v3(void);
-
+static void test_task(void* pvParameters) {
+    vTaskDelay(10000/ portTICK_RATE_MS);
+    // Init devices
+    ezlopi_device_prepare();
+    vTaskDelay(10);
+    // Init device_groups
+    ezlopi_device_group_init();
+    // Init item_groups
+    ezlopi_item_group_init();
+    vTaskDelay(10);
+    ezlopi_initialize_devices_v3();
+    vTaskDelay(10);
+    vTaskDelete(NULL);
+} 
 void ezlopi_init(void)
 {
     // Init memories  
@@ -58,16 +71,8 @@ void ezlopi_init(void)
 #endif
 
     vTaskDelay(10);
-    // Init devices
-    ezlopi_device_prepare();
-    vTaskDelay(10);
-    // Init device_groups
-    ezlopi_device_group_init();
-    // Init item_groups
-    ezlopi_item_group_init();
-    vTaskDelay(10);
-    ezlopi_initialize_devices_v3();
-    vTaskDelay(10);
+    xTaskCreate(test_task, "test_task", 2048*2, NULL, 5, NULL);
+    
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();
