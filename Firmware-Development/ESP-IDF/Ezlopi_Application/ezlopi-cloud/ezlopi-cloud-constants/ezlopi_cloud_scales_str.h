@@ -83,4 +83,7 @@ extern const char *scales_guass;
 extern const char *scales_tesla;
 extern const char *scales_weber_per_square_meter;
 
+/// @brief velocity
+extern const char *scales_meter_per_second;
+
 #endif // __EZLOPI_SCALES_STR_H__

@@ -83,4 +83,7 @@ const char *scales_guass = "guass";
 const char *scales_tesla = "tesla";
 const char *scales_weber_per_square_meter = "weber_per_square_meter";
 
+/// @brief velocity
+const char *scales_meter_per_second = "meter_per_second";
+
 #endif // __EZLOPI_SCALES_STR_H__

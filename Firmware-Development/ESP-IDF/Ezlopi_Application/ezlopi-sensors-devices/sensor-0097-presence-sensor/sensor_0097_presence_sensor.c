@@ -231,6 +231,9 @@ static int __prepare(void *arg)
 
             device_args->dma_spi_buffer[0] = heap_caps_malloc(BUFF_SIZE * sizeof(uint16_t), MALLOC_CAP_DMA); // samples_spi_buf_1;
             device_args->dma_spi_buffer[1] = heap_caps_malloc(BUFF_SIZE * sizeof(uint16_t), MALLOC_CAP_DMA); // samples_spi_buf_2;
+            
+            if(!device_args->dma_spi_buffer[0]) TRACE_E("Unable to allocate memory for dma_spi_buffer[0]");
+            if(!device_args->dma_spi_buffer[1]) TRACE_E("Unable to allocate memory for dma_spi_buffer[1]");
             device_args->samples_spi_buf = device_args->dma_spi_buffer[0];
 
             presence_sensor_dev_item_prep(prep_arg, device_args);

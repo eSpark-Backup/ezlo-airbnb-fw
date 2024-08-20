@@ -21,7 +21,7 @@ extern const char *value_type_pressure;
 extern const char *value_type_substance_amount;
 // extern const  char *value_type_power;
 extern const char *value_type_humidity;
-// extern const  char *value_type_velocity;
+extern const char *value_type_velocity;
 extern const char *value_type_acceleration;
 // extern const  char *value_type_direction;
 extern const char *value_type_general_purpose;
