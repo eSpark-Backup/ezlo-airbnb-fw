@@ -44,7 +44,7 @@ const char *ezlopi_item_name_intrusion_alarm = "intrusion_alarm";
 // const  char *ezlopi_item_name_tampering_move_alarm = "tampering_move_alarm";
 // const  char *ezlopi_item_name_tampering_impact_alarm = "tampering_impact_alarm";
 // const  char *ezlopi_item_name_tampering_invalid_code_alarm = "tampering_invalid_code_alarm";
-// const  char *ezlopi_item_name_smoke_alarm = "smoke_alarm";
+const char *ezlopi_item_name_smoke_alarm = "smoke_alarm";
 // const  char *ezlopi_item_name_dust_in_device = "dust_in_device";
 const char *ezlopi_item_name_water_leak_alarm = "water_leak_alarm";
 const char *ezlopi_item_name_water_filter_replacement_alarm = "water_filter_replacement_alarm";
@@ -125,7 +125,7 @@ const char *ezlopi_item_name_rgbcolor = "rgbcolor";
 // const  char *ezlopi_item_name_rgbcolor_stop = "rgbcolor_stop";
 // const  char *ezlopi_item_name_rgbcolor_up = "rgbcolor_up";
 // const  char *ezlopi_item_name_rotation = "rotation";
-// const  char *ezlopi_item_name_security_threat = "security_threat";
+const char *ezlopi_item_name_security_threat = "security_threat";
 // const  char *ezlopi_item_name_seismic_intensity = "seismic_intensity";
 // const  char *ezlopi_item_name_seismic_magnitude = "seismic_magnitude";
 // const  char *ezlopi_item_name_rain_rate = "rain_rate";
@@ -252,5 +252,7 @@ const char *ezlopi_item_name_particles_5_um = "particles_5_um";
 const char *ezlopi_item_name_particles_10_um = "particles_10_um";
 const char *ezlopi_item_name_presence = "presence";
 const char *ezlopi_item_name_velocity = "velocity";
+const char *ezlopi_item_name_marijuana_alarm = "marijuana_alarm";
+const char *ezlopi_item_name_vape_alarm = "vape_alarm";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

@@ -17,10 +17,10 @@ int presence_sensor_dev_item_prep(s_ezlopi_prep_arg_t *prep_args, s_device_args_
     cJSON* cj_device = prep_args->cjson_device;
 
     __prepare_presence_sensor_presence_and_motion_direction_device_item(&parent_id, cj_device, device_args); // parent device
-    // __prepare_presence_sensor_horizontal_angle_device_item(parent_id, cj_device, device_args);
-    // __prepare_presence_sensor_vertical_angle_device_item(parent_id, cj_device, device_args);
-    // __prepare_presence_sensor_velocity_device_item(parent_id, cj_device, device_args);
-    // __prepare_presence_sensor_distance_device_item(parent_id, cj_device, device_args);
+    __prepare_presence_sensor_horizontal_angle_device_item(parent_id, cj_device, device_args);
+    __prepare_presence_sensor_vertical_angle_device_item(parent_id, cj_device, device_args);
+    __prepare_presence_sensor_velocity_device_item(parent_id, cj_device, device_args);
+    __prepare_presence_sensor_distance_device_item(parent_id, cj_device, device_args);
 
     return ret;
 }

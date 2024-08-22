@@ -44,7 +44,7 @@ extern const char *ezlopi_item_name_intrusion_alarm;
 // extern const  char *ezlopi_item_name_tampering_move_alarm;
 // extern const  char *ezlopi_item_name_tampering_impact_alarm;
 // extern const  char *ezlopi_item_name_tampering_invalid_code_alarm;
-// extern const  char *ezlopi_item_name_smoke_alarm;
+extern const char *ezlopi_item_name_smoke_alarm;
 // extern const  char *ezlopi_item_name_dust_in_device;
 extern const char *ezlopi_item_name_water_leak_alarm;
 extern const char *ezlopi_item_name_water_filter_replacement_alarm;
@@ -125,7 +125,7 @@ extern const char *ezlopi_item_name_rgbcolor;
 // extern const  char *ezlopi_item_name_rgbcolor_stop;
 // extern const  char *ezlopi_item_name_rgbcolor_up;
 // extern const  char *ezlopi_item_name_rotation;
-// extern const  char *ezlopi_item_name_security_threat;
+extern const char *ezlopi_item_name_security_threat;
 // extern const  char *ezlopi_item_name_seismic_intensity;
 // extern const  char *ezlopi_item_name_seismic_magnitude;
 // extern const  char *ezlopi_item_name_rain_rate;
@@ -251,5 +251,7 @@ extern const char *ezlopi_item_name_particles_2_dot_5_um;
 extern const char *ezlopi_item_name_particles_5_um;
 extern const char *ezlopi_item_name_particles_10_um;
 extern const char *ezlopi_item_name_presence;
+extern const char *ezlopi_item_name_marijuana_alarm;
+extern const char *ezlopi_item_name_vape_alarm;
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

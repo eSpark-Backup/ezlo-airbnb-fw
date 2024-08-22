@@ -17,7 +17,7 @@ const char *subcategory_door = "door";
 const char *subcategory_leak = "leak";
 const char *subcategory_motion = "motion";
 // const  char *subcategory_glass = "glass";
-// const  char *subcategory_smoke = "smoke";
+const char *subcategory_smoke = "smoke";
 // const  char *subcategory_co = "co";
 // const  char *subcategory_co2 = "co2";
 const char *subcategory_gas = "gas";
@@ -61,5 +61,6 @@ const char *subcategory_navigation = "navigation";
 // const  char *subcategory_time = "time";
 const char *subcategory_intrusion = "intrusion";
 const char *subcategory_presence = "presence";
-
+const char *subcategory_marijuana = "marijuana";
+const char *subcategory_vape = "vape";
 #endif // __EZLOPI_SUBCATEGORY_H__

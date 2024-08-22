@@ -17,7 +17,7 @@ extern const char *subcategory_door;
 extern const char *subcategory_leak;
 extern const char *subcategory_motion;
 // extern const  char *subcategory_glass;
-// extern const  char *subcategory_smoke;
+extern const char *subcategory_smoke;
 // extern const  char *subcategory_co;
 // extern const  char *subcategory_co2;
 extern const char *subcategory_gas;
@@ -61,5 +61,7 @@ extern const char *subcategory_navigation;
 // extern const  char *subcategory_time;
 extern const char *subcategory_intrusion;
 extern const char *subcategory_presence;
+extern const char *subcategory_marijuana;
+extern const char *subcategory_vape;
 
 #endif // __EZLOPI_SUBCATEGORY_H__

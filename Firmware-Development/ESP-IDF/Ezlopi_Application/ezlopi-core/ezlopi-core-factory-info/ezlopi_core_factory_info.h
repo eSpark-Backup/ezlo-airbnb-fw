@@ -172,14 +172,22 @@ extern "C"
 #elif defined (CONFIG_IDF_TARGET_ESP32S3)
     static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\
     \"dev_type\": 6,\
-    \"dev_name\": \"PMS\",\
+    \"dev_name\": \"ZE08CH02\",\
     \"id_room\": 35,\
-    \"id_item\": 97\
+    \"id_item\": 69,\
+    \"gpio_tx\": 48,\
+    \"gpio_rx\": 45,\
+    \"baud\": 9600\
 }],\"chipset\":\"ESP32S3\"}";
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
     static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";
 #endif 
 #endif
+
+
+
+
+
 
 #ifdef __cplusplus
 }
