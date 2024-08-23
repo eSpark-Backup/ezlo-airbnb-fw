@@ -254,5 +254,7 @@ const char *ezlopi_item_name_presence = "presence";
 const char *ezlopi_item_name_velocity = "velocity";
 const char *ezlopi_item_name_marijuana_alarm = "marijuana_alarm";
 const char *ezlopi_item_name_vape_alarm = "vape_alarm";
+const char *ezlopi_item_name_air_quality = "air_quality";
+const char *ezlopi_item_name_air_quality_grade = "air_quality_grade";
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

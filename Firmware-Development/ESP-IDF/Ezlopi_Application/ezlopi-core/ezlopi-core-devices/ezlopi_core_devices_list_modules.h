@@ -276,6 +276,6 @@ EZLOPI_DEVICE_LIST("sensor_0098_I2C_tamper_switch      ", 98, sensor_0098_I2C_ta
 #if (1 == SENSOR_0099_SHTC3_TEMP_HUMIDITY)
 EZLOPI_DEVICE_LIST("sensor_0099_SHTC3_temp_humidity      ", 99, sensor_0099_SHTC3_temp_humidity)
 #endif // SENSOR_0099_SHTC3_TEMP_HUMIDITY
-
 //////// End of sensor/device list
+
 EZLOPI_DEVICE_LIST(NULL, 0, NULL)

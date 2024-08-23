@@ -1,4 +1,4 @@
-#include "pms5003.hpp"
+#include "pms5003.h"
 
 static const char* TAG = "PMS";
 uint8_t volatile pmsStatusReg = 0x00; 
@@ -16,7 +16,8 @@ void pms_init(PM25_AQI_Data* data)
     pms_uart_setup(data); /* Passing the data parameter for the uart tasl : ezlopi_uart_channel_task() */
     pms_setup_control_gpio(PMS_SET_PIN, PMS_RESET_PIN);
     pms_startup();
-    pms_create_sleep_timer(data); /* Passing the data parameter for the timer callback : pms_timer_callback()*/
+    pms_active_mode(PMS_SET_PIN);
+    // pms_create_sleep_timer(data); /* Passing the data parameter for the timer callback : pms_timer_callback()*/
 }
 
 /*!
@@ -150,30 +151,30 @@ void pms_print_data(PM25_AQI_Data* data)
 {
   if(data->available == true)
   {
-    ESP_LOGI(TAG ,"AQI reading success");
+    // printf("AQI reading success");
 
-    ESP_LOGI(TAG,"---------------------------------------");
-    ESP_LOGI(TAG,"Concentration Units (standard)");
-    ESP_LOGI(TAG,"---------------------------------------");
-    ESP_LOGI(TAG,"PM 1.0: %d", data->pm10_standard); 
-    ESP_LOGI(TAG,"PM 2.5: %d", data->pm25_standard); 
-    ESP_LOGI(TAG,"PM 10:  %d", data->pm100_standard); 
+    // printf("---------------------------------------");
+    // printf("Concentration Units (standard)");
+    // printf("---------------------------------------");
+    printf("PM 1.0: %d\r\n", data->pm10_standard); 
+    printf("PM 2.5: %d\r\n", data->pm25_standard); 
+    printf("PM 10:  %d\r\n", data->pm100_standard); 
 
-    ESP_LOGI(TAG,"---------------------------------------");
-    ESP_LOGI(TAG,"Concentration Units (environmental)");
-    ESP_LOGI(TAG,"---------------------------------------");
-    ESP_LOGI(TAG,"PM 1.0: %d", data->pm10_env); 
-    ESP_LOGI(TAG,"PM 2.5: %d", data->pm25_env); 
-    ESP_LOGI(TAG,"PM 10:  %d", data->pm100_env); 
+    // printf("---------------------------------------");
+    // printf("Concentration Units (environmental)");
+    // printf("---------------------------------------");
+    // printf("PM 1.0: %d", data->pm10_env); 
+    // printf("PM 2.5: %d", data->pm25_env); 
+    // printf("PM 10:  %d", data->pm100_env); 
 
-    ESP_LOGI(TAG,"---------------------------------------");
-    ESP_LOGI(TAG,"Particles > 0.3um / 0.1L air: %d", data->particles_03um); 
-    ESP_LOGI(TAG,"Particles > 0.5um / 0.1L air: %d", data->particles_05um); 
-    ESP_LOGI(TAG,"Particles > 1.0um / 0.1L air: %d", data->particles_10um); 
-    ESP_LOGI(TAG,"Particles > 2.5um / 0.1L air: %d", data->particles_25um); 
-    ESP_LOGI(TAG,"Particles > 5.0um / 0.1L air: %d", data->particles_50um); 
-    ESP_LOGI(TAG,"Particles > 10 um / 0.1L air: %d", data->particles_100um); 
-    ESP_LOGI(TAG,"---------------------------------------");
+    // printf("---------------------------------------");
+    // printf("Particles > 0.3um / 0.1L air: %d", data->particles_03um); 
+    // printf("Particles > 0.5um / 0.1L air: %d", data->particles_05um); 
+    // printf("Particles > 1.0um / 0.1L air: %d", data->particles_10um); 
+    // printf("Particles > 2.5um / 0.1L air: %d", data->particles_25um); 
+    // printf("Particles > 5.0um / 0.1L air: %d", data->particles_50um); 
+    // printf("Particles > 10 um / 0.1L air: %d", data->particles_100um); 
+    // printf("---------------------------------------");
     data->available = false;
   }
 
@@ -212,6 +213,7 @@ esp_err_t pms_read_upcall(uint8_t* buffer, PM25_AQI_Data* data)
     if (sum != data->checksum) {
       return ESP_FAIL;
     }
+    data->available = true; 
     /* success! */
     return ESP_OK;
 }

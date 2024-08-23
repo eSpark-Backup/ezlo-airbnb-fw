@@ -67,4 +67,5 @@ const char *value_type_temperature = "temperature";
 
 const char *value_type_fingerprint_action = "fingerprint_action";
 const char *value_type_presence_operation_mode = "presence_operation_mode";
+const char *value_type_air_quality = "air_quality";
 

@@ -253,5 +253,7 @@ extern const char *ezlopi_item_name_particles_10_um;
 extern const char *ezlopi_item_name_presence;
 extern const char *ezlopi_item_name_marijuana_alarm;
 extern const char *ezlopi_item_name_vape_alarm;
+extern const char *ezlopi_item_name_air_quality;
+extern const char *ezlopi_item_name_air_quality_grade;
 
 #endif // __EZLOPI_ITEM_NAME_STR_H__

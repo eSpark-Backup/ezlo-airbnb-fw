@@ -18,11 +18,25 @@
 
 static int __prepare(void* arg);
 static int __init(l_ezlopi_item_t* item);
+static int __get_item(l_ezlopi_item_t* item, void* arg);
 static int __notify(l_ezlopi_item_t* item);
 static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device);
 static void __prepare_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
+
+static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t size);
+
+const char* aqi_grade[] =  {
+    "excellent",
+    "good",
+    "lightly_polluted",
+    "moderately_polluted",
+    "heavily_polluted",
+    "severely_polluted",
+    "extremely_polluted",
+    "unknown"
+};
 
 int sensor_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {
@@ -40,6 +54,9 @@ int sensor_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t* item, voi
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
+    {
+        ret =__get_item(item, arg);
+    }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
         ret = __get_cjson_value(item, arg);
@@ -150,26 +167,26 @@ static int __prepare(void* arg)
                     }
                 }
 
-                l_ezlopi_device_t* child_aqi_device = ezlopi_device_add_device(cj_device, "aqi");
-                if (child_aqi_device)
+                l_ezlopi_device_t* child_voc_device = ezlopi_device_add_device(cj_device, "voc");
+                if (child_voc_device)
                 {
-                    TRACE_I("Child_aqi_device-[0x%x] ", child_aqi_device->cloud_properties.device_id);
-                    child_aqi_device->cloud_properties.category = category_level_sensor;
-                    __prepare_device_cloud_properties(child_aqi_device, cj_device);
+                    TRACE_I("child_voc_device-[0x%x] ", child_voc_device->cloud_properties.device_id);
+                    child_voc_device->cloud_properties.category = category_level_sensor;
+                    __prepare_device_cloud_properties(child_voc_device, cj_device);
 
-                    child_aqi_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
+                    child_voc_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
 
-                    l_ezlopi_item_t* aqi_item = ezlopi_device_add_item_to_device(child_aqi_device, sensor_0010_I2C_BME680);
-                    if (aqi_item)
+                    l_ezlopi_item_t* voc_item = ezlopi_device_add_item_to_device(child_voc_device, sensor_0010_I2C_BME680);
+                    if (voc_item)
                     {
-                        aqi_item->cloud_properties.item_name = ezlopi_item_name_volatile_organic_compound_level;
-                        aqi_item->cloud_properties.value_type = value_type_substance_amount;
-                        aqi_item->cloud_properties.scale = scales_parts_per_million;
-                        __prepare_cloud_properties(aqi_item, cj_device, user_data);
+                        voc_item->cloud_properties.item_name = ezlopi_item_name_volatile_organic_compound_level;
+                        voc_item->cloud_properties.value_type = value_type_substance_amount;
+                        voc_item->cloud_properties.scale = scales_parts_per_million;
+                        __prepare_cloud_properties(voc_item, cj_device, user_data);
                     }
                     else
                     {
-                        ezlopi_device_free_device(child_aqi_device);
+                        ezlopi_device_free_device(child_voc_device);
                         ret = -1;
                     }
                 }
@@ -222,10 +239,49 @@ static int __prepare(void* arg)
                     }
                 }
 
+                l_ezlopi_device_t* child_aqi_device = ezlopi_device_add_device(cj_device, "aqi");
+                if (child_aqi_device)
+                {
+                    TRACE_I("Child_aqi_device-[0x%x] ", child_aqi_device->cloud_properties.device_id);
+                    child_aqi_device->cloud_properties.category = category_level_sensor;
+                    child_aqi_device->cloud_properties.subcategory = subcategory_airpollution;
+                    __prepare_device_cloud_properties(child_aqi_device, cj_device);
+
+                    child_aqi_device->cloud_properties.parent_device_id = parent_temp_humid_device->cloud_properties.device_id;
+
+                    l_ezlopi_item_t* aqi_item = ezlopi_device_add_item_to_device(child_aqi_device, sensor_0010_I2C_BME680);
+                    if (aqi_item)
+                    {
+                        aqi_item->cloud_properties.item_name = ezlopi_item_name_air_quality;
+                        aqi_item->cloud_properties.value_type = value_type_air_quality;
+                        aqi_item->cloud_properties.scale = scales_aqi;
+                        __prepare_cloud_properties(aqi_item, cj_device, user_data);
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(child_aqi_device);
+                        ret = -1;
+                    }
+
+                    l_ezlopi_item_t* aqi_grade_item = ezlopi_device_add_item_to_device(child_aqi_device, sensor_0010_I2C_BME680);
+                    if (aqi_grade_item)
+                    {
+                        aqi_grade_item->cloud_properties.item_name = ezlopi_item_name_air_quality_grade;
+                        aqi_grade_item->cloud_properties.value_type = value_type_token;
+                        aqi_grade_item->cloud_properties.scale = NULL;
+                        __prepare_cloud_properties(aqi_grade_item, cj_device, user_data);
+                    }
+                    else
+                    {
+                        ezlopi_device_free_device(child_aqi_device);
+                        ret = -1;
+                    }
+                }
+
                 if ((NULL == temperature_item) &&
                     (NULL == humidity_item) &&
                     (NULL == child_pressure_device) &&
-                    (NULL == child_aqi_device) &&
+                    (NULL == child_voc_device) &&
                     (NULL == child_altitude_device) &&
                     (NULL == child_co2_device))
                 {
@@ -245,6 +301,22 @@ static int __prepare(void* arg)
         }
     }
 
+    return ret;
+}
+
+static int __get_item(l_ezlopi_item_t* item, void* arg)
+{
+    int ret = 0;
+    if (item && arg)
+    {
+        cJSON* cj_result = (cJSON*)arg;
+        if (ezlopi_item_name_air_quality_grade == item->cloud_properties.item_name)
+        {
+            uint8_t size = sizeof(aqi_grade)/ sizeof(aqi_grade[0]);
+            __add_enums_to_json(cj_result, aqi_grade, size);
+        }
+        ret = 1;
+    }
     return ret;
 }
 
@@ -296,7 +368,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 }
                 else if (ezlopi_item_name_volatile_organic_compound_level == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->iaq, item->cloud_properties.scale);
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->voc_equivalent, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_distance == item->cloud_properties.item_name)
                 {
@@ -305,6 +377,16 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 else if (ezlopi_item_name_co2_level == item->cloud_properties.item_name)
                 {
                     ezlopi_valueformatter_float_to_cjson(cj_device, user_data->co2_equivalent, item->cloud_properties.scale);
+                }
+                else if (ezlopi_item_name_air_quality == item->cloud_properties.item_name)
+                {
+                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->iaq, item->cloud_properties.scale);
+                }
+                else if (ezlopi_item_name_air_quality_grade == item->cloud_properties.item_name)
+                {
+                    uint8_t aqi_grade_level = (float)user_data->iaq / 50;
+                    cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_valueFormatted_str, aqi_grade[aqi_grade_level]);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_value_str, aqi_grade[aqi_grade_level]);
                 }
             }
         }
@@ -320,12 +402,13 @@ static int __notify(l_ezlopi_item_t* item)
         bme680_data_t* user_data = (bme680_data_t*)item->user_arg;
         if (user_data)
         {
-            float temperature = user_data->temperature;
-            float humidity = user_data->humidity;
-            float pressure = user_data->pressure;
-            float iaq = user_data->iaq;
-            float altitude = user_data->altitude;
-            float co2_eqv = user_data->co2_equivalent;
+            // float temperature = user_data->temperature;
+            // float humidity = user_data->humidity;
+            // float pressure = user_data->pressure;
+            // float iaq = user_data->iaq;
+            // float altitude = user_data->altitude;
+            // float voc_equivalent = user_data->voc_equivalent;
+            // float co2_eqv = user_data->co2_equivalent;
 
             bme680_get_data(user_data);
 
@@ -333,7 +416,7 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 // if (fabs(user_data->temperature - temperature) > 0.05)
                 // {
-                    user_data->temperature = temperature;
+                    // user_data->temperature = temperature;
                     ezlopi_device_value_updated_from_device_broadcast(item);
                 // }
             }
@@ -341,7 +424,7 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 // if (fabs(user_data->humidity - humidity) > 0.05)
                 // {
-                    user_data->humidity = humidity;
+                    // user_data->humidity = humidity;
                     ezlopi_device_value_updated_from_device_broadcast(item);
                 // }
             }
@@ -349,7 +432,7 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 // if (fabs((user_data->pressure / 1000.0f) - (pressure / 1000.0f)) > 0.05)
                 // {
-                    user_data->pressure = pressure;
+                    // user_data->pressure = pressure;
                     ezlopi_device_value_updated_from_device_broadcast(item);
                 // }
             }
@@ -357,7 +440,15 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 // if (fabs(user_data->iaq - iaq) > 0.05)
                 // {
-                    user_data->iaq = iaq;
+                    // user_data->voc_equivalent = voc_equivalent;
+                    ezlopi_device_value_updated_from_device_broadcast(item);
+                // }
+            }
+            if (ezlopi_item_name_air_quality == item->cloud_properties.item_name)
+            {
+                // if (fabs(user_data->aqi - aqi) > 0.05)
+                // {
+                    // user_data->aqi = aqi;
                     ezlopi_device_value_updated_from_device_broadcast(item);
                 // }
             }
@@ -365,7 +456,7 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 // if (fabs(user_data->altitude - altitude) > 0.05)
                 // {
-                    user_data->altitude = altitude;
+                    // user_data->altitude = altitude;
                     ezlopi_device_value_updated_from_device_broadcast(item);
                 // }
             }
@@ -373,7 +464,7 @@ static int __notify(l_ezlopi_item_t* item)
             {
                 // if (fabs(user_data->co2_equivalent - co2_eqv) > 0.05)
                 // {
-                    user_data->co2_equivalent = co2_eqv;
+                    // user_data->co2_equivalent = co2_eqv;
                     ezlopi_device_value_updated_from_device_broadcast(item);
                 // }
             }
@@ -381,4 +472,25 @@ static int __notify(l_ezlopi_item_t* item)
     }
 
     return ret;
+}
+
+static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t size)
+{
+    if (cj_result)
+    {
+        //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
+        cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
+        if (NULL != json_array_enum)
+        {
+            for (uint8_t i = 0; i < size; i++)
+            {
+                cJSON* json_value = cJSON_CreateString(__FUNCTION__, enums[i]);
+                if (NULL != json_value)
+                {
+                    cJSON_AddItemToArray(json_array_enum, json_value);
+                }
+            }
+            cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
+        }
+    }
 }

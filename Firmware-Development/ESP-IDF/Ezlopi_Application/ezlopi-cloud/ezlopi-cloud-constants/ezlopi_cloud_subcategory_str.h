@@ -53,7 +53,7 @@ extern const  char *subcategory_particulate_matter;
 // extern const  char *subcategory_health;
 // extern const  char *subcategory_modulation;
 // extern const  char *subcategory_soil;
-// extern const  char *subcategory_airpullution;
+extern const char *subcategory_airpollution;
 extern const char *subcategory_electricity;
 extern const char *subcategory_sound;
 extern const char *subcategory_navigation;

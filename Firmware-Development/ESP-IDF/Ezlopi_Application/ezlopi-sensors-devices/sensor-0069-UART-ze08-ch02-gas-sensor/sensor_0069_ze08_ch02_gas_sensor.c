@@ -248,6 +248,7 @@ static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t si
         }
     }
 }
+
 static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t* device)
 {
     device->cloud_properties.category = category_level_sensor;

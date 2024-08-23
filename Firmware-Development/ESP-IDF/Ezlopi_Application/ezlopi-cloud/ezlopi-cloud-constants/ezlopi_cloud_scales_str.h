@@ -86,4 +86,7 @@ extern const char *scales_weber_per_square_meter;
 /// @brief velocity
 extern const char *scales_meter_per_second;
 
+/// @brief air quality index
+extern const char *scales_aqi;
+
 #endif // __EZLOPI_SCALES_STR_H__

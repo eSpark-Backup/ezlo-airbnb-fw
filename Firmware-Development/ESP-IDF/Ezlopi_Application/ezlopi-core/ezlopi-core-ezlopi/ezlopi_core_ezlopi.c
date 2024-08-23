@@ -68,7 +68,6 @@ void ezlopi_init(void)
     vTaskDelay(10);
     ezlopi_initialize_devices_v3();
     vTaskDelay(10);
-    
 
 #if defined(CONFIG_EZPI_SERV_ENABLE_MODES)
     ezlopi_core_modes_init();

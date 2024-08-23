@@ -171,21 +171,21 @@ void dfrobot_ens160_get_data(ens160_t* ens160)
    *       after re-powering.
    */
   uint8_t status = dfrobot_ens160_get_ens160_status(ens160);
-  ESP_LOGI(TAG, "Sensor operating status : %d", status);
+  // ESP_LOGI(TAG, "Sensor operating status : %d", status);
 
   /**
    * Get the air quality index
    * Return value: 1-Excellent, 2-Good, 3-Moderate, 4-Poor, 5-Unhealthy
    */
   uint8_t aqi = dfrobot_ens160_get_aqi(ens160);
-  ESP_LOGI(TAG, "Air quality index : %d", aqi);
+  // ESP_LOGI(TAG, "Air quality index : %d", aqi);
 
   /**
    * Get TVOC concentration
    * Return value range: 0–65000, unit: ppb
    */
   uint16_t tvoc = dfrobot_ens160_get_tvoc(ens160);
-  ESP_LOGI(TAG, "Concentration of total volatile organic compounds : %d ppb", tvoc);
+  // ESP_LOGI(TAG, "Concentration of total volatile organic compounds : %d ppb", tvoc);
 
   /**
    * Get CO2 equivalent concentration calculated according to the detected data of VOCs and hydrogen (eCO2 – Equivalent CO2)
@@ -194,7 +194,7 @@ void dfrobot_ens160_get_data(ens160_t* ens160)
    *               Poor(1000 - 1500), Unhealthy(> 1500)
    */
   uint16_t eco2 = dfrobot_ens160_get_eco2(ens160);
-  ESP_LOGI(TAG, "Carbon dioxide equivalent concentration : %d ppm", eco2);
+  // ESP_LOGI(TAG, "Carbon dioxide equivalent concentration : %d ppm", eco2);
 
   ens160->data.status = status;
   ens160->data.aqi = aqi;
