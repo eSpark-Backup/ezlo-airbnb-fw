@@ -21,6 +21,7 @@
 
 #include "sensor_0068_ENS160_gas_sensor.h"
 #include "sensor_0068_ENS160_gas_sensor_settings.h"
+#include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 /*
@@ -205,6 +206,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
   device->cloud_properties.device_type = dev_type_sensor;
   device->cloud_properties.info = NULL;
   device->cloud_properties.device_type_id = NULL;
+  device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
@@ -269,7 +271,7 @@ static int __prepare(void* arg, void* user_arg)
           TRACE_I("Child_ens160_aqi_device-[0x%x] ", child_ens160_voc_device->cloud_properties.device_id);
           __prepare_device_cloud_properties(child_ens160_voc_device, prep_arg->cjson_device);
 
-          child_ens160_voc_device->cloud_properties.parent_device_id = parent_ens160_aqi_device->cloud_properties.device_id;
+          // child_ens160_voc_device->cloud_properties.parent_device_id = parent_ens160_aqi_device->cloud_properties.device_id;
           l_ezlopi_item_t* voc_item = ezlopi_device_add_item_to_device(child_ens160_voc_device, sensor_0068_ENS160_gas_sensor);
           if (voc_item)
           {
@@ -293,7 +295,7 @@ static int __prepare(void* arg, void* user_arg)
           TRACE_I("Child_ens160_co2_device-[0x%x] ", child_ens160_co2_device->cloud_properties.device_id);
           __prepare_device_cloud_properties(child_ens160_co2_device, prep_arg->cjson_device);
 
-          child_ens160_co2_device->cloud_properties.parent_device_id = parent_ens160_aqi_device->cloud_properties.device_id;
+          // child_ens160_co2_device->cloud_properties.parent_device_id = parent_ens160_aqi_device->cloud_properties.device_id;
           l_ezlopi_item_t* co2_item = ezlopi_device_add_item_to_device(child_ens160_co2_device, sensor_0068_ENS160_gas_sensor);
           if (co2_item)
           {

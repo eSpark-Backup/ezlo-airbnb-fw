@@ -12,4 +12,5 @@ idf_component_register(SRCS "sensor-0098-I2C-tamper-switch.c" "${config_src}"
                                 ezlopi-cloud-constants
                                 pca9536-io-expander
                                 ezlopi-hal-i2c
+                                device-airbnb
                     )

@@ -16,3 +16,21 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.cdt.core 1 0 2024-08-26 23:36:23.997
 !MESSAGE Indexed 'Application' (32 sources, 96 headers) in 4.47 sec: 6,452 declarations; 32,192 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0052%)
+!SESSION 2024-08-27 11:56:53.575 -----------------------------------------------
+eclipse.buildId=Version 1.16.0
+java.version=17.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2024-08-27 11:57:19.442
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2024-08-27 11:57:19.452
+!MESSAGE Log4j2 initialized with config file E:\GitHub\ezlo-airbnb-fw\Firmware-Development\STM32CubeIDE\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-08-27 11:57:28.665
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2024-08-27 12:35:52.529
+!MESSAGE Indexed 'Ac_BF' (35 sources, 121 headers) in 6.2 sec: 13,086 declarations; 72,564 references; 0 unresolved inclusions; 1 syntax errors; 0 unresolved names (0%)

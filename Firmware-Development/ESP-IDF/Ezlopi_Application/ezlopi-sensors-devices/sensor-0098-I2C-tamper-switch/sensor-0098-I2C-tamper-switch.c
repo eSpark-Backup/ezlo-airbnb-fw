@@ -13,6 +13,7 @@
 #include "sensor-0098-I2C-tamper-switch.h"
 
 #include "ezlopi_cloud_constants.h"
+#include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 static const char* intrusion_alarm_token[] = {
@@ -142,6 +143,7 @@ static void prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
+    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)

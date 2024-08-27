@@ -925,7 +925,7 @@ cJSON* ezlopi_device_create_device_table_from_prop(l_ezlopi_device_t * device_pr
             cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_name_str, device_prop->cloud_properties.device_name);
             cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_type_str, device_prop->cloud_properties.device_type);
             cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_reachable_str, true);
-            cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_persistent_str, true);
+            cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_persistent_str, false);
             cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_serviceNotification_str, false);
             cJSON_AddBoolToObject(__FUNCTION__, cj_device, ezlopi_armed_str, device_prop->cloud_properties.armed);
 

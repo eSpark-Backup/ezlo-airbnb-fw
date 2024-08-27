@@ -16,6 +16,7 @@
 
 #include "ALS_LTR303.h"
 #include "sensor_0008_I2C_LTR303ALS.h"
+#include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg);
@@ -133,6 +134,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* 
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.info = NULL;
     device->cloud_properties.device_type_id = NULL;
+    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void __prepare_item_properties(l_ezlopi_item_t* item, cJSON* cj_param)

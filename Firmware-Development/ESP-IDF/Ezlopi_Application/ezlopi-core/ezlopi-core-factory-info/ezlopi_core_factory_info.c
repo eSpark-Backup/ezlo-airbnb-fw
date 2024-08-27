@@ -406,7 +406,7 @@ char* ezlopi_factory_info_v3_get_provisioning_uuid(void)
 char* ezlopi_factory_info_v3_get_ssid(bool state)
 {
     char *read_data = NULL;
-    char *tmp_data = "eSpark Wifi";
+    char *tmp_data = "StormFiber-2.4G";
     int len = strlen(tmp_data) + 1;
     read_data = ezlopi_malloc(__FUNCTION__, len);
     memcpy(read_data, tmp_data, len);
@@ -434,7 +434,7 @@ char* ezlopi_factory_info_v3_get_ssid(bool state)
 char* ezlopi_factory_info_v3_get_password(bool state)
 {
     char *read_data = NULL;
-    char *tmp_data = "47356880";
+    char *tmp_data = "47779884";
     
     int len = strlen(tmp_data) + 1;
     read_data = ezlopi_malloc(__FUNCTION__, len);

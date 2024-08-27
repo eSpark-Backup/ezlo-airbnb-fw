@@ -16,6 +16,7 @@
 #include "sensor_0069_ze08_ch02_gas_sensor.h"
 
 #include "ze08_ch2o.h"
+#include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
 static int __prepare(void* arg, void* user_arg);
@@ -256,6 +257,7 @@ static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
+    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
@@ -282,6 +284,7 @@ static void __prepare_smoke_device_cloud_properties(l_ezlopi_device_t* device)
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
+    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void __prepare_smoke_alarm_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
@@ -325,6 +328,7 @@ static void __prepare_smoke_vape_device_cloud_properties(l_ezlopi_device_t* devi
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
+    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void __prepare_smoke_vape_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
@@ -351,6 +355,7 @@ static void __prepare_smoke_marijuana_device_cloud_properties(l_ezlopi_device_t*
     device->cloud_properties.device_type = dev_type_sensor;
     device->cloud_properties.device_type_id = NULL;
     device->cloud_properties.info = NULL;
+    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
 static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
@@ -417,7 +422,7 @@ static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON* cj_device, void
     {
         ret = 1;
         __prepare_ze08_ch2o_sensor_device_cloud_properties(ze08_ch2o_sensor_device);
-        *parent_id = ze08_ch2o_sensor_device->cloud_properties.device_id; 
+        // *parent_id = ze08_ch2o_sensor_device->cloud_properties.device_id; 
         l_ezlopi_item_t* ze08_ch02_ppm_item = ezlopi_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
         if (ze08_ch02_ppm_item)
         {
@@ -446,7 +451,7 @@ static int __prepare_gas_sensor_vape(uint32_t parent_id, cJSON* cj_device, void*
     {
         ret = 1;
         __prepare_smoke_vape_device_cloud_properties(device);
-        device->cloud_properties.parent_device_id = parent_id; 
+        // device->cloud_properties.parent_device_id = parent_id; 
         l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item)
         {
@@ -475,7 +480,7 @@ static int __prepare_gas_sensor_smoke(uint32_t parent_id, cJSON* cj_device, void
     {
         ret = 1;
         __prepare_smoke_device_cloud_properties(device);
-        device->cloud_properties.parent_device_id = parent_id; 
+        // device->cloud_properties.parent_device_id = parent_id; 
         l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item)
         {
@@ -517,7 +522,7 @@ static int __prepare_gas_sensor_marijuana(uint32_t parent_id, cJSON* cj_device, 
     {
         ret = 1;
         __prepare_smoke_marijuana_device_cloud_properties(device);
-        device->cloud_properties.parent_device_id = parent_id; 
+        // device->cloud_properties.parent_device_id = parent_id; 
         l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item)
         {

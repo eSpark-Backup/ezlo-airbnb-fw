@@ -8,4 +8,5 @@ idf_component_register(SRCS "sensor_0069_ze08_ch02_gas_sensor.c" "${config_src}"
                                 ezlopi-core-valueformatter
                                 
                                 ezlopi-hal-uart
+                                device-airbnb
                     )
