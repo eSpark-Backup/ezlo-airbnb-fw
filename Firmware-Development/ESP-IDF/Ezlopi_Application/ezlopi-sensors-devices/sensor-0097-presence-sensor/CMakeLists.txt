@@ -17,6 +17,7 @@ idf_component_register(SRCS "sensor_0097_presence_sensor.c" "radar_app.c" "prese
                                 ${EZLOPI_CLOUD_COMPONENTS}
                                 radar_app
                                 ifxRadar 
-                                ifxAvian)
+                                ifxAvian
+                                device-airbnb)
 
 

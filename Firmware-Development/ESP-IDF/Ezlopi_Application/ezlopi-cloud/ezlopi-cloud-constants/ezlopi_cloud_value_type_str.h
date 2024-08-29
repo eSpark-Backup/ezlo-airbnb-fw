@@ -42,7 +42,7 @@ extern const char *value_type_frequency;
 extern const char *value_type_ultraviolet;
 extern const char *value_type_electrical_resistance;
 // extern const  char *value_type_electrical_conductivity;
-// extern const  char *value_type_loudness;
+extern const char *value_type_loudness;
 extern const char *value_type_moisture;
 // extern const  char *value_type_time;
 // extern const  char *value_type_radon_concentration;

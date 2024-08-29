@@ -2,6 +2,7 @@
 #include "ezlopi_core_devices_list.h"
 #include "ezlopi_cloud_constants.h"
 #include "sensor_0097_presence_sensor.h"
+#include "device_airbnb.h"
 
 static int __prepare_presence_sensor_distance_device_item(uint32_t parent_id, cJSON* cj_device, s_device_args_t *device_args);
 static int __prepare_presence_sensor_velocity_device_item(uint32_t parent_id, cJSON* cj_device, s_device_args_t *device_args);
@@ -17,10 +18,10 @@ int presence_sensor_dev_item_prep(s_ezlopi_prep_arg_t *prep_args, s_device_args_
     cJSON* cj_device = prep_args->cjson_device;
 
     __prepare_presence_sensor_presence_and_motion_direction_device_item(&parent_id, cj_device, device_args); // parent device
-    __prepare_presence_sensor_horizontal_angle_device_item(parent_id, cj_device, device_args);
-    __prepare_presence_sensor_vertical_angle_device_item(parent_id, cj_device, device_args);
-    __prepare_presence_sensor_velocity_device_item(parent_id, cj_device, device_args);
-    __prepare_presence_sensor_distance_device_item(parent_id, cj_device, device_args);
+    // __prepare_presence_sensor_horizontal_angle_device_item(parent_id, cj_device, device_args);
+    // __prepare_presence_sensor_vertical_angle_device_item(parent_id, cj_device, device_args);
+    // __prepare_presence_sensor_velocity_device_item(parent_id, cj_device, device_args);
+    // __prepare_presence_sensor_distance_device_item(parent_id, cj_device, device_args);
 
     return ret;
 }
@@ -37,6 +38,7 @@ static int __prepare_presence_sensor_presence_and_motion_direction_device_item(u
         presence_and_motion_direction_device->cloud_properties.category = category_generic_sensor;
         presence_and_motion_direction_device->cloud_properties.subcategory = subcategory_presence;
         presence_and_motion_direction_device->cloud_properties.device_type = dev_type_sensor;
+        presence_and_motion_direction_device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(presence_and_motion_direction_device->cloud_properties.device_id);
 
         l_ezlopi_item_t *presence_item = ezlopi_device_add_item_to_device(presence_and_motion_direction_device, presence_sensor_v3);
         if (presence_item)

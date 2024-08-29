@@ -9,17 +9,9 @@
 #include "ezlopi_core_device_value_updated.h"
 #include "ezlopi_cloud_constants.h"
 
-// #include "ezlopi_cloud.h"
-// #include "ezlopi_actions.h"
-// #include "ezlopi_devices_list.h"
-// #include "ezlopi_cloud_constants.h"
-// #include "ezlopi_device_value_updated.h"
-
 #include "radar_app.h"
 #include "ezlopi_service_gpioisr.h"
 #include "sensor_0097_presence_sensor.h"
-
-#define PRESENCE_SENSOR_INTERRUPT_PIN 10
 
 static const char *presence_token_vals[3] = {
     "unknown",

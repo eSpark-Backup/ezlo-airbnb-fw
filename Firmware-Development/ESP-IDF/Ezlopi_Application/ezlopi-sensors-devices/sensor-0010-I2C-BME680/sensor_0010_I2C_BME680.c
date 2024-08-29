@@ -24,6 +24,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
 
 static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t size);
 
+uint16_t co2_ranges[] = { 700, 800, 1100, 1500, 2000, 3000, 5000 };
+
 const char* aqi_grade[] =  {
     "excellent",
     "good",
@@ -161,9 +163,23 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
                 }
                 else if (ezlopi_item_name_air_quality_grade == item->cloud_properties.item_name)
                 {
-                    uint8_t aqi_grade_level = (float)user_data->iaq / 50;
-                    cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_valueFormatted_str, aqi_grade[aqi_grade_level]);
-                    cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_value_str, aqi_grade[aqi_grade_level]);
+                    double aqi_grade_index = (float)user_data->iaq / 50;
+                    
+                    double co2_ppm_index = 0;
+                    for (size_t index = 0; index < sizeof(co2_ranges)/ sizeof(co2_ranges[0]); index++)
+                    {
+                        if(user_data->co2_equivalent < co2_ranges[index])
+                        {
+                            co2_ppm_index = index;
+                            break;
+                        }
+                    }
+                    
+                    double voc_index = user_data->voc_equivalent/ 100;
+                    
+                    uint8_t index = fmax(voc_index, fmax(co2_ppm_index, aqi_grade_index));
+                    cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_valueFormatted_str, aqi_grade[index]);
+                    cJSON_AddStringToObject(__FUNCTION__, cj_device, ezlopi_value_str, aqi_grade[index]);
                 }
             }
         }

@@ -155,6 +155,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 int dimmable_value_percentage = 0;
                 CJSON_GET_VALUE_DOUBLE(cjson_params, ezlopi_value_str, dimmable_value_percentage);
                 int dimmable_value = (int)((dimmable_value_percentage * 255) / 100);
+                ezlopi_airbnb_set_rgb_led_status(dimmable_value);
                 led_strip_set_brightness(&dimmer_args->sk6812_strip, dimmable_value);
                 led_strip_flush(&dimmer_args->sk6812_strip);
                 
@@ -167,6 +168,7 @@ static int __set_cjson_value(l_ezlopi_item_t* item, void* arg)
                 CJSON_GET_VALUE_DOUBLE(cjson_params, ezlopi_value_str, led_state);
                 dimmer_args->previous_brightness = (false == led_state) ? dimmer_args->sk6812_strip.brightness : dimmer_args->previous_brightness;
                 int brightness_value = (false == led_state) ? 0 : ((0 == dimmer_args->previous_brightness) ? 255 : dimmer_args->previous_brightness);
+                ezlopi_airbnb_set_rgb_led_status(brightness_value);
                 led_strip_set_brightness(&dimmer_args->sk6812_strip, brightness_value);
                 led_strip_flush(&dimmer_args->sk6812_strip);
 
@@ -213,6 +215,7 @@ static int __init(l_ezlopi_item_t* item)
                         };
 
                         err |= led_strip_fill(&dimmer_args->sk6812_strip, 0, dimmer_args->sk6812_strip.length, color);
+                        ezlopi_airbnb_set_rgb_led_status(1);
                         if (ESP_OK == (err = led_strip_set_brightness(&dimmer_args->sk6812_strip, 255)))
                         {
                             if (ESP_OK == (err = led_strip_flush(&dimmer_args->sk6812_strip)))

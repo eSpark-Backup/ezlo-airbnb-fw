@@ -235,7 +235,7 @@ l_ezlopi_device_t* ezlopi_device_add_device(cJSON* cj_device, const char* last_n
 
         if (NULL != last_name)
         {
-            snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s_%s", tmp_device_name, last_name);
+            snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s%s", tmp_device_name, last_name);
         }
         else
         {

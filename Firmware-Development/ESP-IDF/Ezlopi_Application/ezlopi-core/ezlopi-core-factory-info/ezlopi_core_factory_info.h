@@ -170,9 +170,13 @@ extern "C"
 #if defined(CONFIG_IDF_TARGET_ESP32)
     static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":101,\"dev_name\":\"Neo Water\",\"id_room\":\"\",\"id_item\":101,\"gpio_in\":27,\"logic_inv\":false,\"pull_up\":true},{\"dev_type\":99,\"dev_name\":\"Neo Water\",\"id_room\":\"\",\"id_item\":99,\"gpio_scl\":32,\"gpio_sda\":33}],\"config_id\":\"2578723617\",\"config_time\":1722960582,\"config_name\":\"Neo_Water\",\"chipset\":\"ESP32\"}";//
 #elif defined (CONFIG_IDF_TARGET_ESP32S3)
-    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":68,\"dev_name\":\"ENS160\",\"id_room\":\"\",\"id_item\":68,\"gpio_sda\":18,\"gpio_scl\":17},{\
+// Smoke Sensors
+// BME680
+// Tamper Switch
+// Presence
+    static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\
     \"dev_type\": 6,\
-    \"dev_name\": \"ZE08CH02\",\
+    \"dev_name\": \"\",\
     \"id_room\": 35,\
     \"id_item\": 69,\
     \"gpio_tx\": 48,\
@@ -180,27 +184,11 @@ extern "C"
     \"baud\": 9600\
 },{\
     \"dev_type\": 6,\
-    \"dev_name\": \"PMS\",\
-    \"id_room\": 35,\
-    \"id_item\": 37,\
-    \"gpio1\": 40,\
-    \"gpio2\": 41,\
-    \"gpio3\": 39,\
-    \"gpio4\": 42,\
-    \"baud\": 9600\
-},{\
-    \"dev_type\": 6,\
-    \"dev_name\": \"bme680\",\
+    \"dev_name\": \"\",\
     \"id_room\": 35,\
     \"id_item\": 10,\
     \"gpio_sda\": 18,\
     \"gpio_scl\": 17\
-},{\
-    \"dev_type\": 6,\
-    \"dev_name\": \"SK6812\",\
-    \"id_room\": 35,\
-    \"id_item\": 9,\
-    \"gpio1\": 47\
 },{\
     \"dev_type\": 6,\
     \"dev_name\": \"Tamper Switch\",\
@@ -211,11 +199,19 @@ extern "C"
     \"slave_addr\": 65\
 },{\
     \"dev_type\": 6,\
-    \"dev_name\": \"Ambient Luminance Sensor\",\
+    \"dev_name\": \"\",\
     \"id_room\": 35,\
-    \"id_item\": 8,\
+    \"id_item\": 97,\
     \"gpio_sda\": 18,\
     \"gpio_scl\": 17\
+},{\
+    \"dev_type\": 6,\
+    \"dev_name\": \"Sound Sensor\",\
+    \"id_room\": 35,\
+    \"id_item\": 69,\
+    \"gpio_tx\": 48,\
+    \"gpio_rx\": 45,\
+    \"baud\": 9600\
 }],\"chipset\":\"ESP32S3\"}";
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
     static const char* ezlopi_config_test = "{\"cmd\":3,\"dev_detail\":[{\"dev_type\":1,\"dev_name\":\"switch_temp\",\"id_room\":\"\",\"id_item\":2,\"gpio_in\":0,\"gpio_out\":25,\"pullup_ip\":false,\"pullup_op\":false,\"is_ip\":false,\"ip_inv\":false,\"op_inv\":false,\"val_ip\":false,\"val_op\":false},{\"dev_type\":7,\"dev_name\":\"temp_humi\",\"id_room\":\"\",\"id_item\":16,\"gpio\":12}],\"config_id\":\"1234567\",\"config_time\":1696508363,\"config_name\":\"My moisture sensor\",\"chipset\":\"ESP32C3\"}";

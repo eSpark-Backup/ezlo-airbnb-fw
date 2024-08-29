@@ -89,4 +89,7 @@ const char *scales_meter_per_second = "meter_per_second";
 /// @brief air quality index
 const char *scales_aqi = "aqi";
 
+/// @brief loudness
+const char *scales_decibel = "decibel";
+
 #endif // __EZLOPI_SCALES_STR_H__

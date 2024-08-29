@@ -80,7 +80,7 @@ static int __notify(l_ezlopi_item_t* item)
     if (item)
     {
         ltr303_data_t* als_ltr303_data = (ltr303_data_t*)item->user_arg;
-        if (als_ltr303_data)
+        if (als_ltr303_data && !ezlopi_airbnb_get_rgb_led_status())
         {
             ltr303_data_t temp_data;
             if (ESP_OK == ltr303_get_val(&temp_data))

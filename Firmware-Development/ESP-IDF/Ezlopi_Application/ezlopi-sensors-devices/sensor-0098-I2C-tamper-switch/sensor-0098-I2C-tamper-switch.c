@@ -16,9 +16,9 @@
 #include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static const char* intrusion_alarm_token[] = {
-    "no_intrusion",
-    "intrusion",
+static const char* tampering_cover_alarm_token[] = {
+    "no_tampering_cover",
+    "tampering_cover",
     "unknown",
 };
 
@@ -77,9 +77,9 @@ static int __get_item(l_ezlopi_item_t* item, void* arg)
             cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
             if (NULL != json_array_enum)
             {
-                for (uint8_t i = 0; i < (sizeof(intrusion_alarm_token)/ sizeof(intrusion_alarm_token[0])); i++)
+                for (uint8_t i = 0; i < (sizeof(tampering_cover_alarm_token)/ sizeof(tampering_cover_alarm_token[0])); i++)
                 {
-                    cJSON* json_value = cJSON_CreateString(__FUNCTION__, intrusion_alarm_token[i]);
+                    cJSON* json_value = cJSON_CreateString(__FUNCTION__, tampering_cover_alarm_token[i]);
                     if (NULL != json_value)
                     {
                         cJSON_AddItemToArray(json_array_enum, json_value);
@@ -101,8 +101,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
   {
     cJSON* cj_result = (cJSON*)arg;
     int value = pca9536_digital_read(TAMPER_SWITCH_GPIO);
-    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, intrusion_alarm_token[!value]);
-    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, intrusion_alarm_token[!value]);
+    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, tampering_cover_alarm_token[!value]);
+    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, tampering_cover_alarm_token[!value]);
   } 
   else
   {
@@ -136,22 +136,12 @@ static int __init(l_ezlopi_item_t* item)
   return ret;
 }
 
-static void prepare_device_cloud_properties(l_ezlopi_device_t* device, cJSON* cj_device)
-{
-    device->cloud_properties.category = category_security_sensor;
-    device->cloud_properties.subcategory = subcategory_intrusion;
-    device->cloud_properties.device_type = dev_type_sensor;
-    device->cloud_properties.info = NULL;
-    device->cloud_properties.device_type_id = NULL;
-    device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
-}
-
 static void prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
 {
     item->cloud_properties.show = true;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_intrusion_alarm;
+    item->cloud_properties.item_name = ezlopi_item_name_tampering_cover_alarm;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
     item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
@@ -178,12 +168,11 @@ static int __prepare(void* arg, void* user_arg)
         cJSON* cj_device = prep_arg->cjson_device;
         if (cj_device)
         {
-            l_ezlopi_device_t* parent_device = ezlopi_device_add_device(prep_arg->cjson_device, NULL);
-            if (parent_device)
+            l_ezlopi_device_t* device = ezlopi_airbnb_get_device();
+            if (device)
             {
                 ret = 1;
-                prepare_device_cloud_properties(parent_device, cj_device);
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(parent_device, sensor_0098_I2C_tamper_switch);
+                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0098_I2C_tamper_switch);
                 if (item)
                 {
                     prepare_item_cloud_properties(item, cj_device);
@@ -191,7 +180,7 @@ static int __prepare(void* arg, void* user_arg)
                 }
                 else
                 {
-                    ezlopi_device_free_device(parent_device);
+                    ezlopi_device_free_device(device);
                     ret = -1;
                 }
             }
