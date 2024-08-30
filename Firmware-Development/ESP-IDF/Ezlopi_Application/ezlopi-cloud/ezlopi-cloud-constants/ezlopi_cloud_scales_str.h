@@ -89,4 +89,7 @@ extern const char *scales_meter_per_second;
 /// @brief air quality index
 extern const char *scales_aqi;
 
+/// @brief loudness
+extern const char *scales_decibel;
+
 #endif // __EZLOPI_SCALES_STR_H__
