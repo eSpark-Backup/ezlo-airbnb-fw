@@ -1,0 +1,2 @@
+Application/User/syscalls.o: \
+ C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Microphones_Streaming/Src/syscalls.c

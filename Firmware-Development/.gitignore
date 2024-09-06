@@ -49,3 +49,14 @@ sdkconfig.old
 
 # Libraries
 /lib
+
+*.html
+*.pdf
+*.xml
+*.chm
+*.jpg
+*.svg
+*.png
+*.pptx
+*.css
+*.bmp
