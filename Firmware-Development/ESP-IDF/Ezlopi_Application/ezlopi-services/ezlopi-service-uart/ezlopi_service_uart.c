@@ -568,7 +568,7 @@ static int ezlopi_service_uart_newtwork_info(cJSON *parent)
     cJSON *cj_network = cJSON_AddObjectToObject(__FUNCTION__, parent, "network");
     if (cj_network)
     {
-        char *wifi_ssid = ezlopi_factory_info_v3_get_ssid(NULL); // Abeer
+        char *wifi_ssid = ezlopi_factory_info_v3_get_ssid();
         cJSON_AddStringToObject(__FUNCTION__, cj_network, ezlopi_ssid_str, wifi_ssid ? wifi_ssid : "");
         ezlopi_factory_info_v3_free(wifi_ssid);
 

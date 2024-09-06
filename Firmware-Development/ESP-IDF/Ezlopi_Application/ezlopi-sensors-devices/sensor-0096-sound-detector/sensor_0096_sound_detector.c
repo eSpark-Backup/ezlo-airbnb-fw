@@ -17,16 +17,15 @@
 #include "sensor_0096_sound_detector_settings.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static int __prepare(void* arg, void* user_arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_item(l_ezlopi_item_t* item, void* arg);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+static int __prepare(void *arg, void *user_arg);
+static int __init(l_ezlopi_item_t *item);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __notify(l_ezlopi_item_t *item);
 
-static int __prepare_sound_detector_sensor(cJSON* cj_device, void* user_arg);
+static int __prepare_sound_detector_sensor(cJSON *cj_device, void *user_arg);
 
-static void __prepare_sound_detector_device_cloud_properties(l_ezlopi_device_t* device);
-static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
+static void __prepare_sound_detector_device_cloud_properties(l_ezlopi_device_t *device);
+static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
 
 /*
 {\
@@ -34,13 +33,13 @@ static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t* item
     \"dev_name\": \"Sound Sensor\",\
     \"id_room\": 35,\
     \"id_item\": 69,\
-    \"gpio_tx\": 48,\
-    \"gpio_rx\": 45,\
-    \"baud\": 9600\
+    \"gpio_tx\": 38,\
+    \"gpio_rx\": 9,\
+    \"baud\": 115200\
 }\
 */
 
-int sensor_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+int sensor_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     // TRACE_D("%s", ezlopi_actions_to_string(action));
@@ -67,7 +66,7 @@ int sensor_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item,
         ret = __notify(item);
         break;
     }
-    
+
     default:
     {
         break;
@@ -76,42 +75,86 @@ int sensor_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t* item,
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+float parse_sound_packet(uint8_t *buffer, uint32_t output_len)
+{
+    if (output_len >= PACKET_SIZE)
+    {
+        if (buffer[0] == HEADER && buffer[1] == PAYLOAD_LENGTH)
+        {
+            uint8_t checksum = buffer[0] ^ buffer[1] ^ buffer[2] ^ buffer[3] ^ buffer[4] ^ buffer[5];
+
+            if (checksum == buffer[6])
+            {
+                union
+                {
+                    float db;
+                    uint8_t bytes[4];
+                } dbValue;
+
+                dbValue.bytes[0] = buffer[2];
+                dbValue.bytes[1] = buffer[3];
+                dbValue.bytes[2] = buffer[4];
+                dbValue.bytes[3] = buffer[5];
+
+                return dbValue.db;
+            }
+        }
+    }
+
+    return 0.0;
+}
+static void __data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle)
+{
+    stm32_sound_intensity_t *data = (stm32_sound_intensity_t *)uart_object_handle->arg;
+
+#if DEBUG_STM32_SOUND
+    for (size_t i = 0; i < output_len; i++)
+    {
+        printf("0x%X ", buffer[i]);
+    }
+    printf("\n");
+#endif
+    data->dbSPL = parse_sound_packet(buffer, output_len);
+    // TRACE_E("Sound : %0.2fdb SPL", data->dbSPL);
+}
+
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
     int ret = 0;
 
-    cJSON* cj_params = (cJSON*)arg;
+    cJSON *cj_params = (cJSON *)arg;
+    stm32_sound_intensity_t *data = (stm32_sound_intensity_t *)item->user_arg;
+    if (!data || !cj_params)
+    {
+        return ret;
+    }
 
-    ezlopi_valueformatter_float_to_cjson(cj_params, 123, item->cloud_properties.scale);
-    
+    ezlopi_valueformatter_float_to_cjson(cj_params, data->dbSPL, item->cloud_properties.scale);
+
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static int __notify(l_ezlopi_item_t *item)
 {
     int ret = 0;
-
-    // ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
-    // if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
-    // {
+    s_sensor_sound_detector_setting_broadcast_interval_t *broadcast_settings = sound_detector_get_broadcast_iterval_setting();
+    static uint32_t sec_count = 0;
+    if (++sec_count >= broadcast_settings->broadcast_interval)
+    {
+        sec_count = 0;
         ezlopi_device_value_updated_from_device_broadcast(item);
-    //     ze08_ch2o_sensor->available = false;
-    // }
-    // else
-    // {
-    //     ret = 1;
-    // }
-
+    }
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
+    ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __data_upcall, item->user_arg);
     return ret;
 }
 
-static void __prepare_sound_detector_device_cloud_properties(l_ezlopi_device_t* device)
+static void __prepare_sound_detector_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_sound;
@@ -121,7 +164,7 @@ static void __prepare_sound_detector_device_cloud_properties(l_ezlopi_device_t* 
     device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
-static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
@@ -130,31 +173,42 @@ static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t* item
     item->cloud_properties.item_name = ezlopi_item_name_loudness;
     item->cloud_properties.value_type = value_type_loudness;
     item->cloud_properties.scale = scales_decibel;
+
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_tx_str, item->interface.uart.tx);
+    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_rx_str, item->interface.uart.rx);
+    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_baud_str, item->interface.uart.baudrate);
+    item->interface.uart.enable = true;
+    item->user_arg = user_arg;
 }
 
-static int __prepare(void* arg, void* user_arg)
+static int __prepare(void *arg, void *user_arg)
 {
     int ret = 0;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
     {
-        ret = __prepare_sound_detector_sensor(prep_arg->cjson_device, NULL);
+        stm32_sound_intensity_t *data = (stm32_sound_intensity_t *)ezlopi_malloc(__FUNCTION__, sizeof(stm32_sound_intensity_t));
+        if (data)
+        {
+            memset(data, 0, sizeof(stm32_sound_intensity_t));
+            ret = __prepare_sound_detector_sensor(prep_arg->cjson_device, data);
+        }
     }
 
     return ret;
 }
 
-static int __prepare_sound_detector_sensor(cJSON* cj_device, void* user_arg)
+static int __prepare_sound_detector_sensor(cJSON *cj_device, void *user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, NULL);
+    l_ezlopi_device_t *device = ezlopi_device_add_device(cj_device, NULL);
 
     if (device)
     {
         ret = 1;
         __prepare_sound_detector_device_cloud_properties(device);
 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0096_sound_detector);
+        l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0096_sound_detector);
         if (item)
         {
             __prepare_sound_detector_item_cloud_properties(item, cj_device, user_arg);

@@ -276,8 +276,8 @@ void ezlopi_wifi_initialize(void)
 
 void ezlopi_wifi_connect_from_id_bin(void)
 {
-    char* wifi_ssid = ezlopi_factory_info_v3_get_ssid(NULL); // Abeer
-    char* wifi_password = ezlopi_factory_info_v3_get_password(NULL); // Abeer
+    char* wifi_ssid = ezlopi_factory_info_v3_get_ssid();
+    char* wifi_password = ezlopi_factory_info_v3_get_password();
 
     if ((NULL != wifi_ssid) && ('\0' != wifi_ssid[0]) &&
         (NULL != wifi_password) && ('\0' != wifi_password[0]))

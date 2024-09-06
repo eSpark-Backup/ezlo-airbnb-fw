@@ -64,7 +64,7 @@ static const char* marijuana_alarm_token[] = {
 };
 
 static const char* smoke_alarm_token[] = {
-    "no_smoke_detected",
+    "no_smoke",
     "smoke_detected",
     "unknown",
 };
