@@ -16,6 +16,9 @@
 #include "sensor_0069_ze08_ch02_gas_sensor.h"
 
 #include "ze08_ch2o.h"
+#include "pms5003.h"
+#include "ens160.h"
+#include "mics6814.h"
 #include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
@@ -39,6 +42,27 @@ static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t* ite
 
 static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t size);
 
+static s_pms5003_sensor_object *pms_object;
+static ezlopi_smoke_t gases;
+static mics6814_t* mics6814;
+static ens160_t* ens160_sensor;
+
+// Function to detect smoke
+static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
+    return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
+            gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
+            gases->co > SMOKE_CO_THRESHOLD &&
+            gases->nh3 > SMOKE_NH3_THRESHOLD);
+}
+
+// Function to detect vape
+static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
+    return (gases->tvoc > VAPE_TVOC_THRESHOLD_LOW && 
+            gases->tvoc < VAPE_TVOC_THRESHOLD_HIGH &&
+            gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
+            gases->co > VAPE_CO_THRESHOLD &&
+            gases->nh3 > VAPE_NH3_THRESHOLD);
+}
 /*
 {\
     \"dev_type\": 6,\
@@ -147,13 +171,26 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
     ret = 1;
 
+    if ((true == pms_is_data_available(&pms_object->pms_data)))
+    {
+        gases.pm25_standard = pms_object->pms_data.pm25_standard;
+        pms_set_data_available_to_false(&pms_object->pms_data);
+    }
+
+    dfrobot_ens160_get_data(ens160_sensor);
+    gases.tvoc = ens160_sensor->data.tvoc;
+
+    gases.nh3 = mics6814_get_gas(mics6814, MICS6814_GAS_NH3);
+    gases.co = mics6814_get_gas(mics6814, MICS6814_GAS_CO);
+
     if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
     {
         ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppm, item->cloud_properties.scale);
     }
     else if (ezlopi_item_name_vape == item->cloud_properties.item_name)
     {
-        bool detected = ze08_ch2o_sensor->ppm > 150.0;
+        // bool detected = ze08_ch2o_sensor->ppm > 150.0;
+        bool detected = ezlopi_detect_vape(&gases);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, vape_alarm_token[detected]);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, vape_alarm_token[detected]);
     }
@@ -165,13 +202,13 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     }
     else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name)
     {
-        bool detected = 0;
+        bool detected = ezlopi_detect_smoke(&gases);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, smoke_alarm_token[detected]);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, smoke_alarm_token[detected]);
     }
     else if (ezlopi_item_name_security_threat == item->cloud_properties.item_name)
     {
-        bool detected = 0;
+        bool detected = ezlopi_detect_smoke(&gases);
         ezlopi_valueformatter_bool_to_cjson(cj_params, detected, item->cloud_properties.scale);
     }
     
@@ -220,6 +257,68 @@ static int __init(l_ezlopi_item_t* item)
                 intitialized = true;
             }
             
+        }
+        pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
+        if (pms_object)
+        {
+            pms_object->pms_tx_pin = 40;
+            pms_object->pms_rx_pin = 41;
+            pms_object->pms_set_pin = 39;
+            pms_object->pms_reset_pin = 42;
+            pms_object->pms_baud_rate = 9600;
+
+            pms_object->pms_active_time = 30;
+            pms_object->pms_sleep_time = 120;
+            pms_object->pms_stability_time = 15;
+            pms_object->pmsStatusReg = 0x00;
+
+            memset(&pms_object->pms_data, 0, sizeof(PM25_AQI_Data));
+
+            pms_object->counter = 0;
+            pms_init(pms_object);
+        }
+
+        ens160_sensor = (ens160_t*) ezlopi_malloc(__FUNCTION__, sizeof(ens160_t));
+        if (ens160_sensor)
+        {
+            memset(ens160_sensor, 0, sizeof(ens160_t));
+            ens160_sensor->ezlopi_i2c = (s_ezlopi_i2c_master_t*) ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_i2c_master_t));
+            ens160_sensor->ezlopi_i2c->clock_speed = ENS160_I2C_SPEED;
+            ens160_sensor->ezlopi_i2c->scl = 17;
+            ens160_sensor->ezlopi_i2c->sda = 18;
+            ens160_sensor->ezlopi_i2c->channel = I2C_NUM_0;
+            ens160_sensor->ezlopi_i2c->address = ENS160_I2C_ADDRESS;
+            ens160_sensor->ezlopi_i2c->enable = true;
+
+            if (NO_ERR != dfrobot_ens160_i2c_begin(ens160_sensor))
+            {
+                TRACE_E("Communication with device failed, please check connection");
+                ret = -1;
+                vTaskDelay(3000 / portTICK_PERIOD_MS);
+            }
+            else
+            {
+                TRACE_E("Begin ok!");
+                dfrobot_ens160_set_pwr_mode(ens160_sensor, ENS160_STANDARD_MODE);
+                // dfrobot_ens160_set_temp_and_hum(ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0); // These should be able to be changed froms settings.
+                dfrobot_ens160_set_temp_and_hum(ens160_sensor, 25, 50);
+            }
+        }
+
+        mics6814 = (mics6814_t*) ezlopi_malloc(__FUNCTION__, sizeof(mics6814_t));
+        if(mics6814)
+        {
+            mics6814->adc.ezlopi_i2c = (s_ezlopi_i2c_master_t*) ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_i2c_master_t));
+            if(mics6814->adc.ezlopi_i2c)
+            {
+                mics6814->adc.ezlopi_i2c->enable = true;
+                mics6814->adc.ezlopi_i2c->address = ADS101X_I2C_ADDRESS_VDD;
+                mics6814->adc.ezlopi_i2c->channel = I2C_NUM_0;
+                mics6814->adc.ezlopi_i2c->sda = ADS101X_I2C_SDA;
+                mics6814->adc.ezlopi_i2c->scl = ADS101X_I2C_SCL;
+                mics6814->adc.ezlopi_i2c->clock_speed = ADS101X_I2C_SPEED;
+                mics6814_init(mics6814, -1); // For Harware Interrupt
+            }        
         }
     }
     else
