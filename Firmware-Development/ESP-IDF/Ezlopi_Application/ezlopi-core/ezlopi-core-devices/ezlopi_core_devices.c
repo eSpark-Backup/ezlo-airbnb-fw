@@ -526,7 +526,7 @@ l_ezlopi_device_t *ezlopi_device_add_device(cJSON *cj_device, const char *last_n
             CJSON_GET_VALUE_STRING_BY_COPY(cj_device, ezlopi_dev_name_str, tmp_device_name);
             if (NULL != last_name)
             {
-                snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s_%s", tmp_device_name, last_name);
+                snprintf(new_device->cloud_properties.device_name, sizeof(new_device->cloud_properties.device_name), "%s%s", tmp_device_name, last_name);
             }
             else
             {
@@ -1052,7 +1052,6 @@ static int ezlopi_device_parse_json_v3(cJSON *cjson_config)
                                     {
                                         s_ezlopi_prep_arg_t device_prep_arg = {.device = &v3_device_list[dev_idx], .cjson_device = cjson_device};
                                         v3_device_list[dev_idx].func(EZLOPI_ACTION_PREPARE, NULL, (void *)&device_prep_arg, NULL);
-                                        vTaskDelay(100/ portTICK_RATE_MS);
                                     }
                                     dev_idx++;
                                 }

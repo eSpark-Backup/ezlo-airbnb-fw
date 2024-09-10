@@ -144,7 +144,7 @@ void AudioProcess(void)
 
 		HAL_UART_Transmit(&huart2, temp, sizeof(temp), 1000);
 	}
-	  Send_Audio_to_USB((int16_t *)PCM_Buffer, (AUDIO_IN_SAMPLING_FREQUENCY / 1000)*AUDIO_IN_CHANNELS * N_MS);
+//	  Send_Audio_to_USB((int16_t *)PCM_Buffer, (AUDIO_IN_SAMPLING_FREQUENCY / 1000)*AUDIO_IN_CHANNELS * N_MS);
 }
 
 

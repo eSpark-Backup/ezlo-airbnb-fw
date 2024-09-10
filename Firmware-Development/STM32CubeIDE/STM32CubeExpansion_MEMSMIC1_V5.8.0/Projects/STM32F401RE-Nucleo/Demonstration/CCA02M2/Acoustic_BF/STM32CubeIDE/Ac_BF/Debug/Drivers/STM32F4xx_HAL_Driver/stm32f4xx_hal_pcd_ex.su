@@ -1,6 +1,0 @@
-C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c:70:19:HAL_PCDEx_SetTxFiFo	8	static
-C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c:112:19:HAL_PCDEx_SetRxFiFo	0	static
-C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c:126:19:HAL_PCDEx_ActivateLPM	4	static
-C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c:143:19:HAL_PCDEx_DeActivateLPM	0	static
-C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c:303:13:HAL_PCDEx_LPM_Callback	0	static
-C:/Users/Abeer.DESKTOP-Q8FRVD0/Downloads/en.x-cube-memsmic1/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c:320:13:HAL_PCDEx_BCD_Callback	0	static

@@ -10,6 +10,8 @@
 
 #define TAG "radar_app.c"
 
+TaskHandle_t radar_task_handle = NULL;  // Task handle for radar task
+
 static esp_err_t __radar_gpio_init(l_ezlopi_item_t *item);
 static esp_err_t __radar_spi_init(s_device_args_t *device_args);
 static void __print_device_config(const ifx_Avian_Config_t *config);
@@ -19,6 +21,7 @@ static int32_t __radar_get_fifo_data(s_device_args_t *device_args);
 
 static void IRAM_ATTR __gpio_isr_handler(void *arg);
 static void IRAM_ATTR __queue_ready_spi_post_cb(spi_transaction_t *trans);
+static void radar_task(void *pvParameters);
 
 void __radar_app_hard_reset(void)
 {
@@ -275,20 +278,27 @@ static ifx_Error_t __radar_process_frame(s_device_args_t *device_args)
 
 static void IRAM_ATTR __gpio_isr_handler(void *user_arg)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)user_arg;
-    if (item)
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    // Notify the radar task
+    vTaskNotifyGiveFromISR(radar_task_handle, &xHigherPriorityTaskWoken);
+    if (xHigherPriorityTaskWoken)
     {
-        s_device_args_t *device_args = item->user_arg;
-        if (device_args)
-        {
-            esp_err_t ret;
-            xensiv_bgt60trxx_esp32_spi_cs_set(device_args->device_handle->m_xensiv_device_handle->iface, GPIO_LEVEL_LOW);
-            if (XENSIV_BGT60TRXX_STATUS_OK !=  (ret = __radar_get_fifo_data(device_args))) // initiate spi dma read request (no computation involved )
-            {
-                // TRACE_E("'radar_get_fifo_data' error[%d]: %s", ret, ifx_error_to_string(ret));
-            }          
-        }
+        portYIELD_FROM_ISR();
     }
+    // l_ezlopi_item_t *item = (l_ezlopi_item_t *)user_arg;
+    // if (item)
+    // {
+    //     s_device_args_t *device_args = item->user_arg;
+    //     if (device_args)
+    //     {
+    //         esp_err_t ret;
+    //         xensiv_bgt60trxx_esp32_spi_cs_set(device_args->device_handle->m_xensiv_device_handle->iface, GPIO_LEVEL_LOW);
+    //         if (XENSIV_BGT60TRXX_STATUS_OK !=  (ret = __radar_get_fifo_data(device_args))) // initiate spi dma read request (no computation involved )
+    //         {
+    //             // TRACE_E("'radar_get_fifo_data' error[%d]: %s", ret, ifx_error_to_string(ret));
+    //         }          
+    //     }
+    // }
 }
 
 static esp_err_t __radar_gpio_init(l_ezlopi_item_t *item)
@@ -333,6 +343,10 @@ static esp_err_t __radar_gpio_init(l_ezlopi_item_t *item)
     gpio_set_intr_type(XNSIV_BGT60_IRQ_GPIO, GPIO_INTR_POSEDGE);
     gpio_intr_enable(XNSIV_BGT60_IRQ_GPIO);
     gpio_isr_handler_add(XNSIV_BGT60_IRQ_GPIO, __gpio_isr_handler, (void *)item);
+
+    xTaskCreate(radar_task, "radar_task", 4096, (void *)item, configMAX_PRIORITIES - 1, &radar_task_handle);
+    // item->interface.gpio.gpio_in.gpio_num = XNSIV_BGT60_IRQ_GPIO;
+    // ezlopi_service_gpioisr_register_v3(item, __interrupt_upcall, 1000);
 
     // Disable Reset
     gpio_set_level(XNSIV_BGT60_RST_GPIO, 1);
@@ -461,34 +475,29 @@ static int32_t __radar_get_fifo_data(s_device_args_t *device_args)
                                           &(device_args->fifo_settings));
 }
 
-#if 0
-static void __presence_sensor_task(void *pv)
+// Radar Task to handle the SPI communication
+static void radar_task(void *pvParameters)
 {
-    l_ezlopi_item_t *item = (l_ezlopi_item_t *)pv;
+    l_ezlopi_item_t *item = (l_ezlopi_item_t *)pvParameters;
 
-    if (item && item->user_arg)
+    while (true)
     {
-        s_device_args_t *device_args = (s_device_args_t *)item->user_arg;
-        TRACE_D("task handle: %p", device_args->task_handle);
-        TRACE_W("Wait complete!");
+        // Wait for notification from ISR
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        while (1)
+        // Perform SPI communication
+        esp_err_t ret;
+        s_device_args_t *device_args = item->user_arg;
+        if (device_args)
         {
-            esp_err_t err = ESP_OK;
-
-            if (ulTaskNotifyTake(false, portMAX_DELAY))
+            xensiv_bgt60trxx_esp32_spi_cs_set(device_args->device_handle->m_xensiv_device_handle->iface, GPIO_LEVEL_LOW);
+            if (XENSIV_BGT60TRXX_STATUS_OK != (ret = __radar_get_fifo_data(device_args)))
             {
-                // TRACE_I("Got event");
-                static int event_count = 0;
-                event_count ++;
-                TRACE_E("event_count : %d", event_count);
+                TRACE_E("'radar_get_fifo_data' error[%d]: %s", ret, esp_err_to_name(ret));
             }
         }
     }
-
-    vTaskDelete(NULL);
 }
-#endif
 
 esp_err_t initializeRadarTask(l_ezlopi_item_t *item)
 {

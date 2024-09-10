@@ -218,17 +218,17 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
-
-    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
-    if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
-    {
-        ezlopi_device_value_updated_from_device_broadcast(item);
-        ze08_ch2o_sensor->available = false;
-    }
-    else
-    {
-        ret = 1;
-    }
+    ezlopi_device_value_updated_from_device_broadcast(item);
+    // ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
+    // if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
+    // {
+    //     ezlopi_device_value_updated_from_device_broadcast(item);
+    //     ze08_ch2o_sensor->available = false;
+    // }
+    // else
+    // {
+    //     ret = 1;
+    // }
 
     return ret;
 }
@@ -240,24 +240,27 @@ static int __init(l_ezlopi_item_t* item)
     static bool intitialized = false;
     if(intitialized)
     {
+        TRACE_W("Already Initialized");
         return ret;
     }
 
     if (ze08_ch2o_sensor)
     {
         ret = 1;
-        if (item->interface.uart.enable)
-        {
-            if (false == ze08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
-            {
-                ret = -1;
-            }
-            else
-            {
-                intitialized = true;
-            }
+        // if (item->interface.uart.enable)
+        // {
+        //     if (false == ze08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
+        //     {
+        //         ret = -1;
+        //     }
+        //     else
+        //     {
+        //         intitialized = true;
+        //     }
             
-        }
+        // }
+        intitialized = true;
+
         pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
         if (pms_object)
         {

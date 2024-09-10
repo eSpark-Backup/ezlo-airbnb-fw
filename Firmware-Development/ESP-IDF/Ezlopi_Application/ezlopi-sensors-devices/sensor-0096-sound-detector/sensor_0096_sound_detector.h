@@ -10,6 +10,8 @@
 #define PAYLOAD_LENGTH 4
 #define PACKET_SIZE 7 // Header (1) + Length (1) + Payload (4) + Checksum (1)
 
+#define DEBUG_STM32_SOUND 0
+    
 typedef struct stm32_sound_intensity
 {
     float dbSPL;

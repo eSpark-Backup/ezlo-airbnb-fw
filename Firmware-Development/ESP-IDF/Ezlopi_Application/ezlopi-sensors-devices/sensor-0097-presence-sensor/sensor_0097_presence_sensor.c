@@ -65,12 +65,7 @@ int presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *a
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        static int count = 0;
-        if(++count > 4)
-        {
-            __notify(item);
-            count = 0;
-        }
+        __notify(item);
         break;
     }
     default:
@@ -104,7 +99,7 @@ static void __add_array_to_object(cJSON *cj_params, const char *const *arr, cons
     {
         cJSON *enum_array = cJSON_CreateStringArray(__FUNCTION__, arr, count);
         cJSON_AddItemToObject(__FUNCTION__, cj_params, "enum", enum_array);
-        TRACE_I("%s", cJSON_Print(__FUNCTION__, cj_params));
+        // TRACE_I("%s", cJSON_Print(__FUNCTION__, cj_params));
     }
 }
 
