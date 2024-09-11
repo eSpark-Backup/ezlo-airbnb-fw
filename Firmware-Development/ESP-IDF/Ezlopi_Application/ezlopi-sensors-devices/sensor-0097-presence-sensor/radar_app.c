@@ -490,10 +490,13 @@ static void radar_task(void *pvParameters)
         s_device_args_t *device_args = item->user_arg;
         if (device_args)
         {
-            xensiv_bgt60trxx_esp32_spi_cs_set(device_args->device_handle->m_xensiv_device_handle->iface, GPIO_LEVEL_LOW);
-            if (XENSIV_BGT60TRXX_STATUS_OK != (ret = __radar_get_fifo_data(device_args)))
+            if(device_args->device_handle)
             {
-                TRACE_E("'radar_get_fifo_data' error[%d]: %s", ret, esp_err_to_name(ret));
+                xensiv_bgt60trxx_esp32_spi_cs_set(device_args->device_handle->m_xensiv_device_handle->iface, GPIO_LEVEL_LOW);
+                if (XENSIV_BGT60TRXX_STATUS_OK != (ret = __radar_get_fifo_data(device_args)))
+                {
+                    TRACE_E("'radar_get_fifo_data' error[%d]: %s", ret, esp_err_to_name(ret));
+                }
             }
         }
     }
