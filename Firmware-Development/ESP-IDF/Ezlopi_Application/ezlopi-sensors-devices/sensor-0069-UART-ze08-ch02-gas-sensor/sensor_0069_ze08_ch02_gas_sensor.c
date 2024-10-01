@@ -171,18 +171,6 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
     ret = 1;
 
-    if ((true == pms_is_data_available(&pms_object->pms_data)))
-    {
-        gases.pm25_standard = pms_object->pms_data.pm25_standard;
-        pms_set_data_available_to_false(&pms_object->pms_data);
-    }
-
-    dfrobot_ens160_get_data(ens160_sensor);
-    gases.tvoc = ens160_sensor->data.tvoc;
-
-    gases.nh3 = mics6814_get_gas(mics6814, MICS6814_GAS_NH3);
-    gases.co = mics6814_get_gas(mics6814, MICS6814_GAS_CO);
-
     if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
     {
         ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppm, item->cloud_properties.scale);
@@ -191,24 +179,28 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     {
         // bool detected = ze08_ch2o_sensor->ppm > 150.0;
         bool detected = ezlopi_detect_vape(&gases);
+        ze08_ch2o_sensor->vape_detected = detected;
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, vape_alarm_token[detected]);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, vape_alarm_token[detected]);
     }
     else if (ezlopi_item_name_marijuana == item->cloud_properties.item_name)
     {
         bool detected = 0;
+        ze08_ch2o_sensor->marijuana_detected = detected;
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, marijuana_alarm_token[detected]);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, marijuana_alarm_token[detected]);
     }
     else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name)
     {
         bool detected = ezlopi_detect_smoke(&gases);
+        ze08_ch2o_sensor->smoke_detected = detected;
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, smoke_alarm_token[detected]);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, smoke_alarm_token[detected]);
     }
     else if (ezlopi_item_name_security_threat == item->cloud_properties.item_name)
     {
         bool detected = ezlopi_detect_smoke(&gases);
+        ze08_ch2o_sensor->smoke_detected = detected;
         ezlopi_valueformatter_bool_to_cjson(cj_params, detected, item->cloud_properties.scale);
     }
     
@@ -218,6 +210,45 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 static int __notify(l_ezlopi_item_t* item)
 {
     int ret = 0;
+    
+    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
+
+    if ((true == pms_is_data_available(&pms_object->pms_data)))
+    {
+        gases.pm25_standard = pms_object->pms_data.pm25_standard;
+        pms_set_data_available_to_false(&pms_object->pms_data);
+    }
+
+    dfrobot_ens160_get_data(ens160_sensor);
+    gases.tvoc = ens160_sensor->data.tvoc;
+    gases.nh3 = mics6814_get_gas(mics6814, MICS6814_GAS_NH3);
+    gases.co = mics6814_get_gas(mics6814, MICS6814_GAS_CO);
+
+    if (ezlopi_item_name_vape == item->cloud_properties.item_name)
+    {
+        bool detected = ezlopi_detect_vape(&gases);
+        if(detected == ze08_ch2o_sensor->vape_detected)
+        {
+            goto exit;
+        }
+    }
+    else if (ezlopi_item_name_marijuana == item->cloud_properties.item_name)
+    {
+        bool detected = 0;
+        if(detected == ze08_ch2o_sensor->marijuana_detected)
+        {
+            goto exit;
+        }
+    }
+    else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name || ezlopi_item_name_security_threat == item->cloud_properties.item_name)
+    {
+        bool detected = ezlopi_detect_smoke(&gases);
+        if(detected == ze08_ch2o_sensor->smoke_detected)
+        {
+            goto exit;
+        }
+    }
+
     ezlopi_device_value_updated_from_device_broadcast(item);
     // ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
     // if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
@@ -229,7 +260,7 @@ static int __notify(l_ezlopi_item_t* item)
     // {
     //     ret = 1;
     // }
-
+    exit:
     return ret;
 }
 

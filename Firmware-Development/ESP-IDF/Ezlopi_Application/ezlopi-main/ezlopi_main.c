@@ -126,7 +126,7 @@ static void __blinky(void *pv)
         snprintf(cmd99_str, 100, "{\"cmd\":99,\"free_heap\":%d,\"heap_watermark\":%d}", free_heap, watermark_heap);
         EZPI_SERV_uart_tx_data(strlen(cmd99_str), (uint8_t *)cmd99_str);
 
-        if (free_heap <= (2 * 1024))
+        if (free_heap <= (10 * 1024))
         {
             TRACE_W("CRITICAL-WARNING: low heap detected..");
 

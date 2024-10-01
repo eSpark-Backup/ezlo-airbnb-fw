@@ -16,19 +16,19 @@
 #include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static const char* tampering_cover_alarm_token[] = {
+static const char *tampering_cover_alarm_token[] = {
     "no_tampering_cover",
     "tampering_cover",
     "unknown",
 };
 
-static int __prepare(void* arg, void* user_arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_item(l_ezlopi_item_t* item, void* arg);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+static int __prepare(void *arg, void *user_arg);
+static int __init(l_ezlopi_item_t *item);
+static int __get_item(l_ezlopi_item_t *item, void *arg);
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static int __notify(l_ezlopi_item_t *item);
 
-int sensor_0098_I2C_tamper_switch(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+int sensor_0098_I2C_tamper_switch(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
   int ret = 0;
   switch (action)
@@ -65,45 +65,46 @@ int sensor_0098_I2C_tamper_switch(e_ezlopi_actions_t action, l_ezlopi_item_t* it
   return ret;
 }
 
-static int __get_item(l_ezlopi_item_t* item, void* arg)
+static int __get_item(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
-    if (item && arg)
+  int ret = 0;
+  if (item && arg)
+  {
+    cJSON *cj_result = (cJSON *)arg;
+    if (cj_result)
     {
-        cJSON* cj_result = (cJSON*)arg;
-        if (cj_result)
+      //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
+      cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
+      if (NULL != json_array_enum)
+      {
+        for (uint8_t i = 0; i < (sizeof(tampering_cover_alarm_token) / sizeof(tampering_cover_alarm_token[0])); i++)
         {
-            //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
-            cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
-            if (NULL != json_array_enum)
-            {
-                for (uint8_t i = 0; i < (sizeof(tampering_cover_alarm_token)/ sizeof(tampering_cover_alarm_token[0])); i++)
-                {
-                    cJSON* json_value = cJSON_CreateString(__FUNCTION__, tampering_cover_alarm_token[i]);
-                    if (NULL != json_value)
-                    {
-                        cJSON_AddItemToArray(json_array_enum, json_value);
-                    }
-                }
-                cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
-            }
-            ret = 1;
+          cJSON *json_value = cJSON_CreateString(__FUNCTION__, tampering_cover_alarm_token[i]);
+          if (NULL != json_value)
+          {
+            cJSON_AddItemToArray(json_array_enum, json_value);
+          }
         }
+        cJSON_AddItemToObject(__FUNCTION__, cj_result, ezlopi_enum_str, json_array_enum);
+      }
+      ret = 1;
     }
-    return ret;
+  }
+  return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
   int ret = 0;
 
-  if (item && arg)
+  if (item && arg && item->user_arg)
   {
-    cJSON* cj_result = (cJSON*)arg;
-    int value = pca9536_digital_read(TAMPER_SWITCH_GPIO);
-    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, tampering_cover_alarm_token[!value]);
-    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, tampering_cover_alarm_token[!value]);
-  } 
+    cJSON *cj_result = (cJSON *)arg;
+    uint8_t *value = item->user_arg;
+    *value = pca9536_digital_read(TAMPER_SWITCH_GPIO);
+    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_valueFormatted_str, tampering_cover_alarm_token[*value]);
+    cJSON_AddStringToObject(__FUNCTION__, cj_result, ezlopi_value_str, tampering_cover_alarm_token[*value]);
+  }
   else
   {
     ret = 1;
@@ -112,15 +113,22 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
   return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static int __notify(l_ezlopi_item_t *item)
 {
   int ret = 0;
-  ezlopi_device_value_updated_from_device_broadcast(item);
+  if (item->user_arg)
+  {
+    uint8_t *value = item->user_arg;
+    if (*value != pca9536_digital_read(TAMPER_SWITCH_GPIO))
+    {
+      ezlopi_device_value_updated_from_device_broadcast(item);
+    }
+  }
 
   return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static int __init(l_ezlopi_item_t *item)
 {
   int ret = -1;
   if (pca9536_init(&item->interface.i2c_master))
@@ -136,60 +144,64 @@ static int __init(l_ezlopi_item_t* item)
   return ret;
 }
 
-static void prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void prepare_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    item->cloud_properties.show = true;
-    item->cloud_properties.has_getter = true;
-    item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_name = ezlopi_item_name_tampering_cover_alarm;
-    item->cloud_properties.value_type = value_type_token;
-    item->cloud_properties.scale = NULL;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+  item->cloud_properties.show = true;
+  item->cloud_properties.has_getter = true;
+  item->cloud_properties.has_setter = false;
+  item->cloud_properties.item_name = ezlopi_item_name_tampering_cover_alarm;
+  item->cloud_properties.value_type = value_type_token;
+  item->cloud_properties.scale = NULL;
+  item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
 }
 
-static void prepare_item_interface_properties(l_ezlopi_item_t* item, cJSON* cj_device)
+static void prepare_item_interface_properties(l_ezlopi_item_t *item, cJSON *cj_device)
 {
-    item->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
-    item->interface.i2c_master.enable = true;
-    item->interface.i2c_master.channel = EZLOPI_I2C_0;
-    item->interface.i2c_master.clock_speed = 400000;
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
-    CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
-    CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
+  item->interface_type = EZLOPI_DEVICE_INTERFACE_I2C_MASTER;
+  item->interface.i2c_master.enable = true;
+  item->interface.i2c_master.channel = EZLOPI_I2C_0;
+  item->interface.i2c_master.clock_speed = 400000;
+  CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_sda_str, item->interface.i2c_master.sda);
+  CJSON_GET_VALUE_GPIO(cj_device, ezlopi_gpio_scl_str, item->interface.i2c_master.scl);
+  CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_slave_addr_str, item->interface.i2c_master.address);
 }
 
-static int __prepare(void* arg, void* user_arg)
+static int __prepare(void *arg, void *user_arg)
 {
-    int ret = 0;
+  int ret = 0;
 
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
-    if (prep_arg)
+  s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
+  if (prep_arg && prep_arg->cjson_device)
+  {
+    cJSON *cj_device = prep_arg->cjson_device;
+    l_ezlopi_device_t *device = ezlopi_airbnb_get_device();
+
+    if (device)
     {
-        cJSON* cj_device = prep_arg->cjson_device;
-        if (cj_device)
+      ret = 1;
+      uint8_t *user_arg = (uint8_t*) ezlopi_malloc(__FUNCTION__, (sizeof(uint8_t)));
+      if (user_arg)
+      {
+        memset(user_arg, 0, sizeof(uint8_t));
+        l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0098_I2C_tamper_switch);
+        if (item)
         {
-            l_ezlopi_device_t* device = ezlopi_airbnb_get_device();
-            if (device)
-            {
-                ret = 1;
-                l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0098_I2C_tamper_switch);
-                if (item)
-                {
-                    prepare_item_cloud_properties(item, cj_device);
-                    prepare_item_interface_properties(item, cj_device);
-                }
-                else
-                {
-                    ezlopi_device_free_device(device);
-                    ret = -1;
-                }
-            }
-            else
-            {
-                ret = -1;
-            }
+          prepare_item_cloud_properties(item, cj_device);
+          prepare_item_interface_properties(item, cj_device);
+          item->user_arg = user_arg;
         }
+        else
+        {
+          free(user_arg);
+          ret = -1;
+        }
+      }
     }
+    else
+    {
+      ret = -1;
+    }
+  }
 
-    return ret;
+  return ret;
 }

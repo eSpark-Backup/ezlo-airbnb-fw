@@ -14,8 +14,11 @@
 
 typedef struct ze08_ch2o_sensor_data
 {
-    bool available;
     float ppm;
+    bool available;
+    bool smoke_detected;
+    bool vape_detected;
+    bool marijuana_detected;
 } ze08_ch2o_sensor_data_t;
 
 
