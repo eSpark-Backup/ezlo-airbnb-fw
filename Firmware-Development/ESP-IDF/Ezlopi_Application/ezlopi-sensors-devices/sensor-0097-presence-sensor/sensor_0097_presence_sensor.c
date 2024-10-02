@@ -82,13 +82,14 @@ static int __notify(l_ezlopi_item_t *item)
     int ret = 0;
 
     s_device_args_t *device_args = (s_device_args_t *) item->user_arg;
+
     esp_err_t error = radar_get_data(device_args);
     if (ESP_OK == error)
     {
         TRACE_I("%s", esp_err_to_name(error));
         ezlopi_device_value_updated_from_device_broadcast(item);
         TRACE_W("range %f, angle_azimuth %f, angle_elevation %f, speed, %f", device_args->target_result.range, device_args->target_result.angle_azimuth, device_args->target_result.angle_elevation, device_args->target_result.speed);
-    }
+    }    
 
     return ret;
 }

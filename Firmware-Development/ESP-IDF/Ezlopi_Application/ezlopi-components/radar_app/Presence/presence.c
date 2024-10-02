@@ -73,7 +73,7 @@ ifx_Error_t presence_config(presence_t* ctx, ifx_Avian_Device_t* device, ifx_Avi
  * @param ctx           context of the application
  * @param frame         collected frame
  */
-ifx_Error_t presence_process(presence_t* presence_context, ifx_Cube_R_t* frame)
+ifx_Error_t presence_process(presence_t* presence_context, ifx_Cube_R_t* frame, ifx_Float_t* range, ifx_Float_t* speed)
 {
     ifx_Matrix_R_t antenna_data;
     
@@ -103,13 +103,16 @@ ifx_Error_t presence_process(presence_t* presence_context, ifx_Cube_R_t* frame)
 
     // printf("Number of targests found: %d\r\n", ps_result.num_targets);
 
-    // if (!isnan(ps_result.target_distance_m) && !isnan(ps_result.target_speed_m_s)) {           
-    //     printf("target_distance_m: %g, target_speed_m_s: %g, target_signal_strength: %g",
-    //         ps_result.target_distance_m, ps_result.target_speed_m_s, ps_result.target_signal_strength);
-    //     printf("\r\n");
-    // }
+    if (!isnan(ps_result.target_distance_m) && !isnan(ps_result.target_speed_m_s)) {           
+        // printf("target_distance_m: %g, target_speed_m_s: %g, target_signal_strength: %g",
+        //     ps_result.target_distance_m, ps_result.target_speed_m_s, ps_result.target_signal_strength);
+        // printf("\r\n");
+        *range = ps_result.target_distance_m;
+        *speed = ps_result.target_speed_m_s;
+    }
 
     presence_context->presence_status = ps_result.cur_presence_state;
+    
     return ifx_error_get();
 }
 

@@ -26,8 +26,8 @@
 #include "radar.h"
 
 #define VELOCITY_APP 0
-#define PRESENCE_APP 0
-#define MOTION_ANGLE_APP 1
+#define PRESENCE_APP 1
+#define MOTION_ANGLE_APP 0 // Issues here, Probably in angle calculation part (Guru Meditation)
 
 #define GPIO_LEVEL_LOW 0
 #define GPIO_LEVEL_HIGH 1

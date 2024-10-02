@@ -246,7 +246,7 @@ static ifx_Error_t __radar_process_frame(s_device_args_t *device_args)
         device_args->frame = ifx_avian_get_next_frame(device_args->device_handle, device_args->frame, device_args->p_samples);
 
 #if PRESENCE_APP | VELOCITY_APP | MOTION_ANGLE_APP
-        ret = presence_process(&device_args->presence_handle, device_args->frame);
+        ret = presence_process(&device_args->presence_handle, device_args->frame, &device_args->target_result.range, &device_args->target_result.speed);
         // TRACE_W("ret: %d", ret);
         ESP_GOTO_ON_ERROR(ret, algo_err, TAG, "failed processing presence!"); // IFX_OK = ESP_OK
 
@@ -479,12 +479,13 @@ static int32_t __radar_get_fifo_data(s_device_args_t *device_args)
 static void radar_task(void *pvParameters)
 {
     l_ezlopi_item_t *item = (l_ezlopi_item_t *)pvParameters;
+    TRACE_E("Task Created");
 
     while (true)
     {
         // Wait for notification from ISR
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
+        
         // Perform SPI communication
         esp_err_t ret;
         s_device_args_t *device_args = item->user_arg;

@@ -17,7 +17,7 @@ extern "C" {
 #endif
 ifx_Error_t presence_init(presence_t* ctx);
 ifx_Error_t presence_config(presence_t* ctx, ifx_Avian_Device_t* device, ifx_Avian_Config_t* dev_config);
-ifx_Error_t presence_process(presence_t* presence_context, ifx_Cube_R_t* frame);
+ifx_Error_t presence_process(presence_t* presence_context, ifx_Cube_R_t* frame, ifx_Float_t* range, ifx_Float_t* speed);
 ifx_Error_t presence_cleanup(presence_t* ctx);
 #ifdef __cplusplus
 }
