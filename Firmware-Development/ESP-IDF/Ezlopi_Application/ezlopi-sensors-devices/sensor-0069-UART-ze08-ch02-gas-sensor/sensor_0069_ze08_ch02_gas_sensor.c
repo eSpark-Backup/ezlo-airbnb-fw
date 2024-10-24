@@ -49,6 +49,7 @@ static ens160_t* ens160_sensor;
 
 // Function to detect smoke
 static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
+    TRACE_E("gases->tvoc: %d, gases->pm25_standard: %d, gases->co : %0.2f, gases->nh3: %0.2f",gases->tvoc, gases->pm25_standard, gases->co, gases->nh3);
     return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
             gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
             gases->co > SMOKE_CO_THRESHOLD &&
@@ -301,9 +302,9 @@ static int __init(l_ezlopi_item_t* item)
             pms_object->pms_reset_pin = 42;
             pms_object->pms_baud_rate = 9600;
 
-            pms_object->pms_active_time = 30;
-            pms_object->pms_sleep_time = 120;
-            pms_object->pms_stability_time = 15;
+            pms_object->pms_active_time = PMS_ACTIVE_TIME;
+            pms_object->pms_sleep_time = PMS_SLEEP_TIME;
+            pms_object->pms_stability_time = PMS_STABILITY_TIME;
             pms_object->pmsStatusReg = 0x00;
 
             memset(&pms_object->pms_data, 0, sizeof(PM25_AQI_Data));

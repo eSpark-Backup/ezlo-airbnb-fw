@@ -84,13 +84,21 @@ static int __notify(l_ezlopi_item_t *item)
     s_device_args_t *device_args = (s_device_args_t *) item->user_arg;
 
     esp_err_t error = radar_get_data(device_args);
-    if (ESP_OK == error)
+    TRACE_I("%s", esp_err_to_name(error));
+    static bool presence = 0;
+    
+    if (ezlopi_item_name_presence == item->cloud_properties.item_name && presence != device_args->target_result.presence)
     {
-        TRACE_I("%s", esp_err_to_name(error));
+        presence = device_args->target_result.presence;
+        ezlopi_device_value_updated_from_device_broadcast(item);
+        
+    }   
+    else if ((ezlopi_item_name_motion_direction == item->cloud_properties.item_name) && device_args->target_result.presence)
+    { 
         ezlopi_device_value_updated_from_device_broadcast(item);
         TRACE_W("range %f, angle_azimuth %f, angle_elevation %f, speed, %f", device_args->target_result.range, device_args->target_result.angle_azimuth, device_args->target_result.angle_elevation, device_args->target_result.speed);
-    }    
-
+    }
+    
     return ret;
 }
 
@@ -121,8 +129,8 @@ static void __add_values_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool 
         {
             __add_array_to_object(cj_params, presence_token_vals, 3);
         }
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", ((true == device_args->target_result.presence) ? "presence" : "not_detected"));
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", ((true == device_args->target_result.presence) ? "presence" : "not_detected"));
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", (true) ? "presence" : "not_detected");
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", (true) ? "presence" : "not_detected");
     }
     if (ezlopi_item_name_distance == item->cloud_properties.item_name)
     {

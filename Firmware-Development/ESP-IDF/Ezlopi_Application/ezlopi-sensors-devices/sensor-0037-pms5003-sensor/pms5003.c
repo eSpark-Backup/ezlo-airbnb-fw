@@ -23,7 +23,9 @@ void pms_init(s_pms5003_sensor_object *pms_object)
   pms_uart_setup(pms_object); /* Passing the data parameter for the uart tasl : ezlopi_uart_channel_task() */
   pms_setup_control_gpio(pms_object->pms_set_pin, pms_object->pms_reset_pin);
   pms_startup(pms_object->pms_set_pin, pms_object->pms_reset_pin);
-  pms_create_sleep_timer(pms_object); /* Passing the data parameter for the timer callback : pms_timer_callback()*/
+  pms_active_mode(pms_object->pms_set_pin);
+//   pms_object->pms_data.available = true;
+//   pms_create_sleep_timer(pms_object); /* Passing the data parameter for the timer callback : pms_timer_callback()*/
 }
 
 /*!
@@ -113,7 +115,7 @@ static void pms_timer_callback(void *arg)
 
     if (sec == pms_object->pms_stability_time)
     {
-      PMS_SET_READ_STATUS(pms_object->pmsStatusReg); // Enable Read Status
+    //   PMS_SET_READ_STATUS(pms_object->pmsStatusReg); // Enable Read Status
     }
   }
 
@@ -219,11 +221,14 @@ esp_err_t pms_read_upcall(uint8_t *buffer, PM25_AQI_Data *data)
   /* put it into a nice struct :) */
   memcpy((void *)data, (void *)buffer_u16, 30);
 
+    ESP_LOGE("", "CheckSum Passed");
   if (sum != data->checksum)
   {
     ESP_LOGE("", "CheckSum Failed");
     return ESP_FAIL;
   }
+  data->available = true;
+
   /* success! */
   return ESP_OK;
 }
