@@ -49,11 +49,11 @@ static ens160_t* ens160_sensor;
 
 // Function to detect smoke
 static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
-    TRACE_E("gases->tvoc: %d, gases->pm25_standard: %d, gases->co : %0.2f, gases->nh3: %0.2f",gases->tvoc, gases->pm25_standard, gases->co, gases->nh3);
+    TRACE_E("gases->tvoc: %d, gases->pm25_standard: %d, gases->eco2 : %0.2f, gases->pm10_standard: %d",gases->tvoc, gases->pm25_standard, gases->eco2, gases->pm10_standard);
     return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
             gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
-            gases->co > SMOKE_CO_THRESHOLD &&
-            gases->nh3 > SMOKE_NH3_THRESHOLD);
+            gases->eco2 > SMOKE_ECO2_THRESHOLD &&
+            gases->pm10_standard > SMOKE_PM1_0_THRESHOLD);
 }
 
 // Function to detect vape
@@ -194,6 +194,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
     else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name)
     {
         bool detected = ezlopi_detect_smoke(&gases);
+        TRACE_E("Smoke : %d", detected);
         ze08_ch2o_sensor->smoke_detected = detected;
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, smoke_alarm_token[detected]);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, smoke_alarm_token[detected]);
@@ -217,11 +218,13 @@ static int __notify(l_ezlopi_item_t* item)
     if ((true == pms_is_data_available(&pms_object->pms_data)))
     {
         gases.pm25_standard = pms_object->pms_data.pm25_standard;
+        gases.pm10_standard = pms_object->pms_data.pm10_standard;
         pms_set_data_available_to_false(&pms_object->pms_data);
     }
 
     dfrobot_ens160_get_data(ens160_sensor);
     gases.tvoc = ens160_sensor->data.tvoc;
+    gases.eco2 = ens160_sensor->data.eco2;
     gases.nh3 = mics6814_get_gas(mics6814, MICS6814_GAS_NH3);
     gases.co = mics6814_get_gas(mics6814, MICS6814_GAS_CO);
 

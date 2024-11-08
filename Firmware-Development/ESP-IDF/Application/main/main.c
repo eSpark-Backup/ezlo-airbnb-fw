@@ -95,6 +95,8 @@ void app_main(void)
 #endif
 
     // ESP_ERROR_CHECK(bme680_init());
+    printf("aqi,tvoc(ppb),eco2(ppm),ch2o(ppm),no2,nh3,co,PM 1.0,PM 2.5,PM 10\n");
+    vTaskDelay(3000/portTICK_RATE_MS);
     while (1)
     {
         // printf("Value = %d\r\n", pca9536_digital_read(0));
@@ -106,15 +108,15 @@ void app_main(void)
 #if ENS_160_SENSOR
         dfrobot_ens160_get_data(&ens160_sensor);
 //   printf("Sensor operating status : %d", status);
-        printf("aqi : %d\r\n", ens160_sensor.data.aqi);
-        printf("tvoc : %d ppb\r\n", ens160_sensor.data.tvoc);
-        printf("eco2 : %d ppm\r\n", ens160_sensor.data.eco2);
+        printf("%d,", ens160_sensor.data.aqi);
+        printf("%d,", ens160_sensor.data.tvoc);
+        printf("%d,", ens160_sensor.data.eco2);
 #endif
 
 #if ZE08_CH2O_SENSOR
         if (ze08_ch2o_data.available)
         {
-            printf("ch2o ppm : %0.2f\r\n", ze08_ch2o_data.ppm);
+            printf("%0.2f,", ze08_ch2o_data.ppm);
             ze08_ch2o_data.available = false;
         }
 #endif
@@ -129,9 +131,9 @@ void app_main(void)
         // float ch4 = mics6814_get_gas(&mics6814, MICS6814_GAS_CH4);
         // float h2 = mics6814_get_gas(&mics6814, MICS6814_GAS_H2);
         // float c2h5oh = mics6814_get_gas(&mics6814, MICS6814_GAS_C2H5OH);
-        printf("no2 : %0.2f\n", no2);
-        printf("nh3 : %0.2f\n", nh3);
-        printf("co : %0.2f\n", co);
+        printf("%0.2f,", no2);
+        printf("%0.2f,", nh3);
+        printf("%0.2f\n", co);
         // printf("c3h8 = %0.2f\n", c3h8);
         // printf("c4h10 = %0.2f\n", c4h10);
         // printf("ch4 = %0.2f\n", ch4);

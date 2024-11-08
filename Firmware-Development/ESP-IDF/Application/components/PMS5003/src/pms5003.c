@@ -149,6 +149,9 @@ void pms_active_mode(gpio_num_t set_pin)
  */
 void pms_print_data(PM25_AQI_Data* data)
 {
+    printf("%d,", data->pm10_standard); 
+    printf("%d,", data->pm25_standard); 
+    printf("%d,", data->pm100_standard); 
   if(data->available == true)
   {
     // printf("AQI reading success");
@@ -156,9 +159,6 @@ void pms_print_data(PM25_AQI_Data* data)
     // printf("---------------------------------------");
     // printf("Concentration Units (standard)");
     // printf("---------------------------------------");
-    printf("PM 1.0: %d\r\n", data->pm10_standard); 
-    printf("PM 2.5: %d\r\n", data->pm25_standard); 
-    printf("PM 10:  %d\r\n", data->pm100_standard); 
 
     // printf("---------------------------------------");
     // printf("Concentration Units (environmental)");

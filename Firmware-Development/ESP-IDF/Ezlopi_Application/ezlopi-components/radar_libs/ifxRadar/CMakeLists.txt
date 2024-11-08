@@ -7,4 +7,4 @@ idf_component_register(SRCS "AngleCapon.c"
                             "RangeDopplerMap.c"
                             "RangeSpectrum.c"
                             "SpectrumAxis.c"
-                    INCLUDE_DIRS "include" REQUIRES muFFT ifxBase ifxAlgo ifxAvian)
+                    INCLUDE_DIRS "include" REQUIRES muFFT ifxBase ifxAlgo ifxAvian ezlopi-util-trace)

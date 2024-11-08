@@ -516,12 +516,27 @@ esp_err_t initializeRadarTask(l_ezlopi_item_t *item)
     if(ESP_OK == (ret = radar_app_init(item)))
     {
         TRACE_I("'radar_app_init' OK");
-        #if 0
-        s_device_args_t *device_args = item->user_arg;
-        xTaskCreatePinnedToCore(__presence_sensor_task, "presense_sensor_task", 2 * 2048, item, 10, &device_args->task_handle, 0);
-        TRACE_D("task handle: %p", device_args->task_handle);
+        #if 1
+        xTaskCreate(radar_app_loop, "radar_app_loop", 2 * 2048, item, 10, NULL);
+        // TRACE_D("task handle: %p", device_args->task_handle);
         #endif
     }
 
     return ret;
+}
+
+void radar_app_loop(void *pvParameters)
+{
+    l_ezlopi_item_t *item = pvParameters;
+    s_device_args_t *device_args = (s_device_args_t *) item->user_arg; 
+
+    while (1)
+    {
+        esp_err_t error = radar_get_data(device_args);
+        // TRACE_I("%s", esp_err_to_name(error));
+        vTaskDelay(50/ portTICK_RATE_MS);
+    }
+
+    vTaskDelete(NULL);
+    
 }

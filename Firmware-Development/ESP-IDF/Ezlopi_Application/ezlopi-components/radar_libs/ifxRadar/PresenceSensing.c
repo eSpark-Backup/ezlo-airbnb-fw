@@ -56,6 +56,7 @@
 #include "SpectrumAxis.h"
 
 #include "presence_radar_default.h"
+#include "ezlopi_util_trace.h"
 /*
 ==============================================================================
    2. LOCAL DEFINITIONS
@@ -65,11 +66,11 @@
 #define MAX_NUM_OF_TARGETS         5
 
 /* default values for presence sensing configuration */
-#define RANGE_FFT_SIZE_DEFAULT 128*4
+#define RANGE_FFT_SIZE_DEFAULT (XENSIV_BGT60TRXX_CONF_NUM_SAMPLES_PER_CHIRP * 4)
 #define RANGE_FFT_WINDOW_TYPE_DEFAULT IFX_WINDOW_BLACKMANNHARRIS
 #define RANGE_FFT_WINDOW_ALPHA_DEFAULT 0
 
-#define DOPPLER_FFT_SIZE_DEFAULT 128*4
+#define DOPPLER_FFT_SIZE_DEFAULT (XENSIV_BGT60TRXX_CONF_NUM_SAMPLES_PER_CHIRP * 4)
 #define DOPPLER_FFT_WINDOW_TYPE_DEFAULT IFX_WINDOW_CHEBYSHEV
 #define DOPPLER_FFT_WINDOW_ALPHA_DEFAULT 60
 
@@ -84,12 +85,12 @@
 //Ours:
 #define RANGE_HYSTERESIS_PERCENT_DEFAULT 10
 //Below settings can be changed as per requirement;
-#define MAX_DETECTION_RANGE_M_DEFAULT ((ifx_Float_t)5.0) 
-#define MIN_DETECTION_RANGE_M_DEFAULT ((ifx_Float_t)0.05) 
+#define MAX_DETECTION_RANGE_M_DEFAULT ((ifx_Float_t)2.0) 
+#define MIN_DETECTION_RANGE_M_DEFAULT ((ifx_Float_t)0.2) 
 
 
-#define PRESENCE_CONFIRM_COUNT_DEFAULT 10
-#define ABSENCE_CONFIRM_COUNT_DEFAULT 5
+#define PRESENCE_CONFIRM_COUNT_DEFAULT 7 // 10
+#define ABSENCE_CONFIRM_COUNT_DEFAULT 5 //5
 
 #define THRESHOLD_FACTOR_PRESENCE_PEAK_DEFAULT ((ifx_Float_t)3)
 #define THRESHOLD_FACTOR_ABSENCE_PEAK_DEFAULT  ((ifx_Float_t)4)
@@ -175,6 +176,8 @@ void state_machine(ifx_PresenceSensing_t* handle)
 {
     if (handle->state == IFX_PRESENCE_SENSING_PRESENT)
     {
+        // TRACE_E("handle->bye_counter ------------------------------------- %d", handle->bye_counter);
+        // TRACE_E("handle->cur_peak_count ------------------------------------- %d", handle->cur_peak_count);
         if (handle->cur_peak_count == 0)
         {
             ++handle->bye_counter;
@@ -195,6 +198,7 @@ void state_machine(ifx_PresenceSensing_t* handle)
     }
     else //if(handle->state == ABSENCE)
     {
+        // TRACE_E("handle->hello_counter ------------------------------------- %d", handle->hello_counter);
         if ( handle->cur_peak_count > 0 || handle->doppler_obj_count > 0)
         {
             ++handle->hello_counter;

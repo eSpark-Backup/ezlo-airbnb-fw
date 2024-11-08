@@ -83,8 +83,8 @@ static int __notify(l_ezlopi_item_t *item)
 
     s_device_args_t *device_args = (s_device_args_t *) item->user_arg;
 
-    esp_err_t error = radar_get_data(device_args);
-    TRACE_I("%s", esp_err_to_name(error));
+    // esp_err_t error = radar_get_data(device_args);
+    // TRACE_I("%s", esp_err_to_name(error));
     static bool presence = 0;
     
     if (ezlopi_item_name_presence == item->cloud_properties.item_name && presence != device_args->target_result.presence)
@@ -129,8 +129,8 @@ static void __add_values_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool 
         {
             __add_array_to_object(cj_params, presence_token_vals, 3);
         }
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", (true) ? "presence" : "not_detected");
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", (true) ? "presence" : "not_detected");
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", presence_token_vals[device_args->target_result.presence + 1]);
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", presence_token_vals[device_args->target_result.presence + 1]);
     }
     if (ezlopi_item_name_distance == item->cloud_properties.item_name)
     {
@@ -144,8 +144,8 @@ static void __add_values_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool 
         {
             __add_array_to_object(cj_params, motion_direction_token_vals, 3);
         }
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", ((device_args->target_result.speed < 0) ? "incoming" : "outgoing"));
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", ((device_args->target_result.speed < 0) ? "incoming" : "outgoing"));
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", ((device_args->target_result.speed < 0) ? motion_direction_token_vals[1] : motion_direction_token_vals[2]));
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", ((device_args->target_result.speed < 0) ? motion_direction_token_vals[1] : motion_direction_token_vals[2]));
     }
     if ((ezlopi_item_name_angle_position == item->cloud_properties.item_name) && (scales_north_pole_degress == item->cloud_properties.scale))
     {

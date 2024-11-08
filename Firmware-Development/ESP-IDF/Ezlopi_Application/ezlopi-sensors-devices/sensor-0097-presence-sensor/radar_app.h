@@ -77,6 +77,7 @@ typedef struct s_device_args
  *  - ESP_FAIL  : failed to setup radar
  */
 esp_err_t radar_app_init(l_ezlopi_item_t *item);
+void radar_app_loop(void *pvParameters);
 
 esp_err_t radar_set_radar_fifo(s_device_args_t *device_args);
 esp_err_t radar_reset_radar_fifo(s_device_args_t *device_args);
