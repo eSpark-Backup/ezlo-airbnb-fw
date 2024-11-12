@@ -58,11 +58,9 @@ static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
 
 // Function to detect vape
 static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
-    return (gases->tvoc > VAPE_TVOC_THRESHOLD_LOW && 
-            gases->tvoc < VAPE_TVOC_THRESHOLD_HIGH &&
+    return (gases->pm10_standard > VAPE_PM1_0_THRESHOLD &&
             gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
-            gases->co > VAPE_CO_THRESHOLD &&
-            gases->nh3 > VAPE_NH3_THRESHOLD);
+            gases->co > VAPE_CH2O_THRESHOLD );
 }
 /*
 {\

@@ -10,6 +10,7 @@
 #include "shtc3.h"
 #include "pca9536.h"
 #include "bme680_bsec.h"
+#include "software_serial.h"
 
 // #define GAS_SENSOR_TEST 0
 #define ENS_160_SENSOR 1
@@ -23,9 +24,40 @@ static const char *TAG = "Application";
 ze08_ch2o_sensor_data_t ze08_ch2o_data;
 #endif
 
+static void app_loop(void *pvParameters)
+{
+    // s_device_args_t *device_args = (s_device_args_t *) item->user_arg; 
+    SwSerial *tmp = sw_new(38, 9, false, 512);
+    printf("%u\n", tmp->bitTime);
+    if (tmp != NULL)
+    {
+        sw_open(tmp, 115200); // 115200 > 9600
+        while (1)   
+        {
+            vTaskDelay(100 / portTICK_RATE_MS);
+            // printf("check recvd data");
+            int len = sw_any(tmp);
+            
+            if (len > 0)
+            {
+                for (size_t i = 0; i < len; i++)
+                {
+                    printf("%02X ", sw_read(tmp));
+                }
+                printf("\r\n");
+            }
+        }
+    }
+
+    vTaskDelete(NULL);
+    
+}
+
 void app_main(void)
 {
     PM25_AQI_Data data;
+    xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
+    
     pms_init(&data);
 #if MICS6814_SENSOR
     mics6814_t mics6814;

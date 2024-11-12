@@ -16,6 +16,7 @@
 #include "sensor_0096_sound_detector.h"
 #include "sensor_0096_sound_detector_settings.h"
 #include "EZLOPI_USER_CONFIG.h"
+#include "software_serial.h"
 
 static int __prepare(void *arg, void *user_arg);
 static int __init(l_ezlopi_item_t *item);
@@ -147,10 +148,40 @@ static int __notify(l_ezlopi_item_t *item)
     return ret;
 }
 
+static void app_loop(void *pvParameters)
+{
+    l_ezlopi_item_t *item = pvParameters;
+    // s_device_args_t *device_args = (s_device_args_t *) item->user_arg; 
+    SwSerial *tmp = sw_new(item->interface.uart.tx, item->interface.uart.rx, false, 512);
+    TRACE_I("%u\n", tmp->bitTime);
+    if (tmp != NULL)
+    {
+        sw_open(tmp, 115200); // 115200 > 9600
+        while (1)   
+        {
+            vTaskDelay(100 / portTICK_RATE_MS);
+            TRACE_I("check recvd data");
+            int len = sw_any(tmp);
+            
+            if (len > 0)
+            {
+                for (size_t i = 0; i < len; i++)
+                {
+                    printf("%02X ", sw_read(tmp));
+                }
+            }
+        }
+    }
+
+    vTaskDelete(NULL);
+    
+}
+
 static int __init(l_ezlopi_item_t *item)
 {
     int ret = 0;
-    ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __data_upcall, item->user_arg);
+    // ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __data_upcall, item->user_arg);
+    xTaskCreatePinnedToCore(app_loop, "app_loop", 2 * 2048, item, 10, NULL, 1);
     return ret;
 }
 

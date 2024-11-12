@@ -10,7 +10,8 @@
         "xmemory0": "c",
         "ze08-ch2o.h": "c",
         "string.h": "c",
-        "pms5003.h": "c"
+        "pms5003.h": "c",
+        "software_serial.h": "c"
     },
     "idf.portWin": "COM6",
     "idf.flashType": "UART"

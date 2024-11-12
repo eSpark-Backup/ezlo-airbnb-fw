@@ -14,11 +14,9 @@
 #define SMOKE_PM1_0_THRESHOLD 100
 
 // Threshold values for vape
-#define VAPE_TVOC_THRESHOLD_LOW 160
-#define VAPE_TVOC_THRESHOLD_HIGH 200 
-#define VAPE_PM2_5_THRESHOLD 1000
-#define VAPE_CO_THRESHOLD 5.5f
-#define VAPE_NH3_THRESHOLD 6.0f
+#define VAPE_PM1_0_THRESHOLD 400 
+#define VAPE_PM2_5_THRESHOLD 600
+#define VAPE_CH2O_THRESHOLD 180
 
 typedef struct ezlopi_smoke
 {
