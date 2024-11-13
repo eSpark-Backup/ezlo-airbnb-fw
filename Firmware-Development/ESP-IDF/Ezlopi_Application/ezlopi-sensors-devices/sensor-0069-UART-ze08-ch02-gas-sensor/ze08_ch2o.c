@@ -50,7 +50,19 @@ static void ze08_ch2o_parse(uint8_t* buffer, ze08_ch2o_sensor_data_t* data)		//n
     if( (buffer[0] == 0xFF) && (buffer[1] == 0x17) && (buffer[2] == 0x04) && (buffer[ZE08_BUFFER_MAXLENGTH-1] == sumNum) )	//head bit and sum are all right
     {
         float ppb = (unsigned int)buffer[4]<<8 | buffer[5];		// bit 4: ppm high 8-bit; bit 5: ppm low 8-bit
-        data->ppm = ppb / 1000.0;	//1ppb = 1000ppm
+        // data->ppm = ppb / 1000.0;	//1ppb = 1000ppm
+        data->ppb = ppb;
         data->available = true;
     }
+}
+
+uint16_t ze08_ch2o_read_ppb(ze08_ch2o_sensor_data_t *data)
+{
+    // if (data->available == true)
+    // {
+    //     data->available = false;
+    //     return data->ppb;
+    // }
+    
+    return data->ppb;
 }

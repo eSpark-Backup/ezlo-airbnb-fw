@@ -14,7 +14,7 @@
 
 typedef struct ze08_ch2o_sensor_data
 {
-    float ppm;
+    float ppb;
     bool available;
     bool smoke_detected;
     bool vape_detected;
@@ -31,5 +31,6 @@ typedef struct ze08_ch2o_sensor_data
  *      - false: error.
  */
 bool ze08_ch2o_sensor_init(s_ezlopi_uart_t *ze08_uart_config, ze08_ch2o_sensor_data_t *data);
+uint16_t ze08_ch2o_read_ppb(ze08_ch2o_sensor_data_t *data);
 
 #endif // _ZE08_CH2O_H_

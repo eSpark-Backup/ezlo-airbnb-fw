@@ -30,7 +30,6 @@
 "./Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_tim.o"
 "./Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_tim_ex.o"
 "./Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_uart.o"
-"./Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_usart.o"
 "./Drivers/STM32F4xx_HAL_Driver/stm32f4xx_ll_usb.o"
 "./Middlewares/ST/STM32_Acoustic_BF_Library/AcousticBF.o"
 "./Middlewares/ST/STM32_USB_Device_Library/Class/Audio-in/usbd_audio_in.o"

@@ -51,7 +51,7 @@
 
 #else // CONFIG_EZPI_HEAP_ENABLE
 
-#define ezlopi_malloc(who, x) malloc(x) // heap_caps_malloc(x, MALLOC_CAP_SPIRAM) 
+#define ezlopi_malloc(who, x) heap_caps_malloc(x, MALLOC_CAP_SPIRAM)  // malloc(x) // 
 #define ezlopi_calloc(who, x, y) calloc(x, y)
 #define ezlopi_free(who, x) if(NULL != x) free(x);
 #define ezlopi_realloc(who, x, y) realloc(x, y)

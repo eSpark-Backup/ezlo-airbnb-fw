@@ -1,8 +1,4 @@
 #include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_log.h"
 #include "pms5003.h"
 #include "mics6814.h"
 #include "ze08-ch2o.h"
@@ -31,7 +27,7 @@ static void app_loop(void *pvParameters)
     printf("%u\n", tmp->bitTime);
     if (tmp != NULL)
     {
-        sw_open(tmp, 115200); // 115200 > 9600
+        sw_open(tmp, 9600); // 115200 > 9600
         while (1)   
         {
             vTaskDelay(100 / portTICK_RATE_MS);
@@ -56,8 +52,9 @@ static void app_loop(void *pvParameters)
 void app_main(void)
 {
     PM25_AQI_Data data;
-    xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
-    
+    // xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
+    // vTaskDelete(NULL);
+    // return;
     pms_init(&data);
 #if MICS6814_SENSOR
     mics6814_t mics6814;
@@ -127,7 +124,7 @@ void app_main(void)
 #endif
 
     // ESP_ERROR_CHECK(bme680_init());
-    printf("aqi,tvoc(ppb),eco2(ppm),ch2o(ppm),no2,nh3,co,PM 1.0,PM 2.5,PM 10\n");
+    printf("aqi,tvoc(ppb),eco2(ppm),ch2o(ppm),PM 1.0,PM 2.5,PM 10,no2,nh3,co\n");
     vTaskDelay(3000/portTICK_RATE_MS);
     while (1)
     {
@@ -148,9 +145,9 @@ void app_main(void)
 #if ZE08_CH2O_SENSOR
         if (ze08_ch2o_data.available)
         {
-            printf("%0.2f,", ze08_ch2o_data.ppm);
             ze08_ch2o_data.available = false;
         }
+        printf("%0.2f,", ze08_ch2o_data.ppm);
 #endif
 
         pms_print_data(&data);

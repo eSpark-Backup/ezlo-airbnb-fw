@@ -137,14 +137,14 @@ esp_err_t sw_enableRx(SwSerial *self, bool State)
     if (State)
     {
         gpio_set_intr_type(self->rxPin, (self->invert) ? GPIO_INTR_POSEDGE : GPIO_INTR_NEGEDGE);
-        gpio_install_isr_service(0);
+        // gpio_install_isr_service(0);
         error = gpio_isr_handler_add(self->rxPin, sw_rx_handler, (void*)self);
 
     }
     else
     {
         error = gpio_isr_handler_remove(self->rxPin);
-        gpio_uninstall_isr_service();
+        // gpio_uninstall_isr_service();
     }
     
     return error;
@@ -200,7 +200,6 @@ esp_err_t sw_open(SwSerial *self, uint32_t baudRate)
 {
     // The oscilloscope told me
     self->bitTime = (esp_clk_cpu_freq() / baudRate);
-    TRACE_E("Bit Time : %d", self->bitTime);
 
     // Rx bit Timing Settings
     switch (baudRate)

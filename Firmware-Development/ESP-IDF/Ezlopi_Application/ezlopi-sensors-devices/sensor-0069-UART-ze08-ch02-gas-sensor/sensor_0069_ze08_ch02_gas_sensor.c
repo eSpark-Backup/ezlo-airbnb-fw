@@ -49,18 +49,20 @@ static ens160_t* ens160_sensor;
 
 // Function to detect smoke
 static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
-    TRACE_E("gases->tvoc: %d, gases->pm25_standard: %d, gases->eco2 : %0.2f, gases->pm10_standard: %d",gases->tvoc, gases->pm25_standard, gases->eco2, gases->pm10_standard);
+    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm25_standard: %d, gases->pm100_standard: %d",gases->tvoc, gases->eco2, gases->pm25_standard, gases->pm100_standard);
     return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
-            gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
             gases->eco2 > SMOKE_ECO2_THRESHOLD &&
-            gases->pm10_standard > SMOKE_PM1_0_THRESHOLD);
+            gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
+            gases->pm100_standard > SMOKE_PM10_0_THRESHOLD);
 }
 
 // Function to detect vape
 static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
+    TRACE_E("gases->pm10_standard: %d, gases->pm25_standard: %d, gases->pm100_standard : %d, gases->ch2o : %d",gases->pm10_standard, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
     return (gases->pm10_standard > VAPE_PM1_0_THRESHOLD &&
             gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
-            gases->co > VAPE_CH2O_THRESHOLD );
+            gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
+            gases->ch2o > VAPE_CH2O_THRESHOLD );
 }
 /*
 {\
@@ -172,7 +174,7 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
 
     if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
     {
-        ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppm, item->cloud_properties.scale);
+        ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppb/1000.0, item->cloud_properties.scale);
     }
     else if (ezlopi_item_name_vape == item->cloud_properties.item_name)
     {
@@ -217,6 +219,7 @@ static int __notify(l_ezlopi_item_t* item)
     {
         gases.pm25_standard = pms_object->pms_data.pm25_standard;
         gases.pm10_standard = pms_object->pms_data.pm10_standard;
+        gases.pm100_standard = pms_object->pms_data.pm100_standard;
         pms_set_data_available_to_false(&pms_object->pms_data);
     }
 
@@ -225,6 +228,7 @@ static int __notify(l_ezlopi_item_t* item)
     gases.eco2 = ens160_sensor->data.eco2;
     gases.nh3 = mics6814_get_gas(mics6814, MICS6814_GAS_NH3);
     gases.co = mics6814_get_gas(mics6814, MICS6814_GAS_CO);
+    gases.ch2o = ze08_ch2o_read_ppb(ze08_ch2o_sensor);
 
     if (ezlopi_item_name_vape == item->cloud_properties.item_name)
     {
@@ -280,18 +284,18 @@ static int __init(l_ezlopi_item_t* item)
     if (ze08_ch2o_sensor)
     {
         ret = 1;
-        // if (item->interface.uart.enable)
-        // {
-        //     if (false == ze08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
-        //     {
-        //         ret = -1;
-        //     }
-        //     else
-        //     {
-        //         intitialized = true;
-        //     }
+        if (item->interface.uart.enable)
+        {
+            if (false == ze08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
+            {
+                ret = -1;
+            }
+            else
+            {
+                intitialized = true;
+            }
             
-        // }
+        }
         intitialized = true;
 
         pms_object = (s_pms5003_sensor_object *)ezlopi_malloc(__FUNCTION__, sizeof(s_pms5003_sensor_object));
