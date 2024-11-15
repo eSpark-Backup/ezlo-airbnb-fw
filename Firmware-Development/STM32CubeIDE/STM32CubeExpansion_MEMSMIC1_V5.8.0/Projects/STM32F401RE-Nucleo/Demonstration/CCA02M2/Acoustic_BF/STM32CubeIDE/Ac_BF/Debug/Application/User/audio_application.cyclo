@@ -1,0 +1,11 @@
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:89:6:CCA02M2_AUDIO_IN_HalfTransfer_CallBack	4
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:100:6:CCA02M2_AUDIO_IN_TransferComplete_CallBack	4
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:115:6:AudioProcess	4
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:177:6:SMR_Init	4
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:216:6:Audio_Libraries_Init	4
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:269:6:SW_IRQ_Tasks_Init	1
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:283:6:SW_Task1_Callback	1
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:293:6:SW_Task2_Callback	1
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:303:6:SW_Task1_Start	1
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:313:6:SW_Task2_Start	1
+C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/audio_application.c:318:6:Error_Handler	1

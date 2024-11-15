@@ -29,6 +29,15 @@
 #define MEASURED_SPL_AT_CALIBRATION 50.0f
 #define CALIBRATION_DBFS -8.0f
 
+#include "smr_glo.h"  // Ensure this header is included for SMR module definitions
+
+// Define the parameters and buffers as static or global
+static smr_static_param_t smr_static_params;
+static smr_dynamic_param_t smr_dynamic_params;
+static uint8_t* persistent_mem;
+static uint8_t* scratch_mem;
+static buffer_t input_buffer, output_buffer;
+
 /** @addtogroup X_CUBE_MEMSMIC1_Applications
   * @{
   */
@@ -109,44 +118,95 @@ void AudioProcess(void)
 	  {
 	    Error_Handler();
 	  }
-	// Calculate RMS using ARM CMSIS-DSP library
-	q15_t rms = 0;
-	arm_rms_q15((q15_t *)PCM_Buffer, PCM_BUFFER_SIZE, &rms);
+	// Fill the input buffer with data before processing
+	input_buffer.data_ptr = PDM_Buffer;  // Assign your input audio data buffer
 
-	// Convert RMS to dB
-	float dBFS = 20 * log10(rms / 32768.0);  // 32768 is the max value for Q15 format
-
-	static uint8_t count = 0;
-	static float dBFSArray[MAX_COUNT_DB] = {0};
-	dBFSArray[count] = dBFS;
-	if (++count == MAX_COUNT_DB)
-	{
-		count = 0;
-		dBFS = 0;
-		for(int x = 0; x < MAX_COUNT_DB; x++)
-		{
-			dBFS += dBFSArray[x];
-		}
-		dBFS = dBFS / MAX_COUNT_DB;
-
-		float dbSPL =  MEASURED_SPL_AT_CALIBRATION + (dBFS - CALIBRATION_DBFS);
-
-		union {
-			float db;
-			uint8_t bytes[4];
-		} dbValue;
-
-		dbValue.db = dbSPL;
-		// Determine if the audio is loud based on dB threshold
-		uint8_t temp[] = {0xAA, 4, dbValue.bytes[0], dbValue.bytes[1], dbValue.bytes[2], dbValue.bytes[3], 0};
-		uint8_t checksum = temp[0] ^ temp[1] ^ temp[2] ^ temp[3] ^ temp[4] ^ temp[5];
-		temp[6] = checksum;
-
-		HAL_UART_Transmit(&huart2, temp, sizeof(temp), 1000);
+	// Step 1: Process the audio buffer
+	if (smr_process(&input_buffer, &output_buffer, persistent_mem) != SMR_ERROR_NONE) {
+		Error_Handler();
 	}
+
+	// Step 2: Retrieve the sound levels
+	if (smr_getConfig(&smr_dynamic_params, persistent_mem) != SMR_ERROR_NONE) {
+		Error_Handler();
+	}
+
+	// Extract and convert the sound level from Q29.2 format
+	int32_t sound_level = smr_dynamic_params.mean_level_left;  // Mono or left channel
+	float sound_level_dB = (float)sound_level / (1 << 2);  // Convert to dB
+//	printf("Sound Level (dB): %.2f\n", sound_level_dB);
+//	// Calculate RMS using ARM CMSIS-DSP library
+//	q15_t rms = 0;
+//	arm_rms_q15((q15_t *)PCM_Buffer, PCM_BUFFER_SIZE, &rms);
+//
+//	// Convert RMS to dB
+//	float dBFS = 20 * log10(rms / 32768.0);  // 32768 is the max value for Q15 format
+//
+//	static uint8_t count = 0;
+//	static float dBFSArray[MAX_COUNT_DB] = {0};
+//	dBFSArray[count] = dBFS;
+//	if (++count == MAX_COUNT_DB)
+//	{
+//		count = 0;
+//		dBFS = 0;
+//		for(int x = 0; x < MAX_COUNT_DB; x++)
+//		{
+//			dBFS += dBFSArray[x];
+//		}
+//		dBFS = dBFS / MAX_COUNT_DB;
+//
+//		float dbSPL =  MEASURED_SPL_AT_CALIBRATION + (dBFS - CALIBRATION_DBFS);
+//
+//		union {
+//			float db;
+//			uint8_t bytes[4];
+//		} dbValue;
+//
+//		dbValue.db = dbSPL;
+//		// Determine if the audio is loud based on dB threshold
+//		uint8_t temp[] = {0xAA, 4, dbValue.bytes[0], dbValue.bytes[1], dbValue.bytes[2], dbValue.bytes[3], 0};
+//		uint8_t checksum = temp[0] ^ temp[1] ^ temp[2] ^ temp[3] ^ temp[4] ^ temp[5];
+//		temp[6] = checksum;
+//
+//		HAL_UART_Transmit(&huart2, temp, sizeof(temp), 1000);
+	HAL_UART_Transmit(&huart2, &sound_level_dB, sizeof(sound_level_dB), 1000);
+//	}
 //	  Send_Audio_to_USB((int16_t *)PCM_Buffer, (AUDIO_IN_SAMPLING_FREQUENCY / 1000)*AUDIO_IN_CHANNELS * N_MS);
 }
 
+void SMR_Init(void)
+{
+    persistent_mem = malloc(smr_persistent_mem_size); /* smr_persistent_mem_size  0x188 */
+    scratch_mem = malloc(smr_scratch_mem_size);       /* smr_scratch_mem_size  0xF04 */
+    // Step 1: Reset the SMR module
+    if (smr_reset(persistent_mem, scratch_mem) != SMR_ERROR_NONE) {
+        Error_Handler();
+    }
+
+
+    // Step 2: Configure static parameters
+    smr_static_params.sampling_rate = AUDIO_IN_SAMPLING_FREQUENCY;
+    if (smr_setParam(&smr_static_params, persistent_mem) != SMR_ERROR_NONE) {
+        Error_Handler();
+    }
+
+    // Step 3: Configure dynamic parameters
+    smr_dynamic_params.enable = 1;  // Enable processing
+    smr_dynamic_params.averaging_time = 250;  // Fast response: 125 ms
+    smr_dynamic_params.filter_type = SMR_PREFILTER_AWEIGHTING;  // A-weighting filter
+    if (smr_setConfig(&smr_dynamic_params, persistent_mem) != SMR_ERROR_NONE) {
+        Error_Handler();
+    }
+
+    // Step 4: Prepare input and output buffer structures
+    input_buffer.nb_channels = 1;  // Mono
+    input_buffer.nb_bytes_per_Sample = 2;  // 16-bit audio
+    input_buffer.buffer_size = AUDIO_IN_BUFFER_SIZE;  // Number of samples per channel
+    input_buffer.mode = 1;  // Interleaved
+
+    // Output buffer is pass-through; copy the input buffer configuration
+    output_buffer = input_buffer;
+}
 
 /**
   * @brief  Initialize the audio libraries adopted
@@ -197,6 +257,8 @@ void Audio_Libraries_Init(void)
   {
     Error_Handler();
   }
+
+  SMR_Init();
 }
 
 /**

@@ -25,12 +25,15 @@ static void app_loop(void *pvParameters)
     // s_device_args_t *device_args = (s_device_args_t *) item->user_arg; 
     SwSerial *tmp = sw_new(38, 9, false, 512);
     printf("%u\n", tmp->bitTime);
+    float value = 0;
+    uint8_t* valuePtr = &value;
+    int x = 0;
     if (tmp != NULL)
     {
         sw_open(tmp, 9600); // 115200 > 9600
         while (1)   
         {
-            vTaskDelay(100 / portTICK_RATE_MS);
+            vTaskDelay(10 / portTICK_RATE_MS);
             // printf("check recvd data");
             int len = sw_any(tmp);
             
@@ -38,9 +41,13 @@ static void app_loop(void *pvParameters)
             {
                 for (size_t i = 0; i < len; i++)
                 {
-                    printf("%02X ", sw_read(tmp));
+                    valuePtr[x++] = sw_read(tmp);
+                    if(x == 4)
+                    {
+                        printf("%0.2f\r\n", value);
+                        x = 0;
+                    }
                 }
-                printf("\r\n");
             }
         }
     }
@@ -52,9 +59,9 @@ static void app_loop(void *pvParameters)
 void app_main(void)
 {
     PM25_AQI_Data data;
-    // xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
-    // vTaskDelete(NULL);
-    // return;
+    xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
+    vTaskDelete(NULL);
+    return;
     pms_init(&data);
 #if MICS6814_SENSOR
     mics6814_t mics6814;
