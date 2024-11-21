@@ -274,6 +274,10 @@ typedef struct
 #define AUDIO_IN_I2S_MOSI_GPIO_PORT                              GPIOB
 #define AUDIO_IN_I2S_MOSI_GPIO_CLK_ENABLE()                      __GPIOB_CLK_ENABLE();
 #define AUDIO_IN_I2S_MOSI_AF                                     GPIO_AF5_SPI2
+#define AUDIO_IN_I2S_WS_PIN                                    GPIO_PIN_12
+#define AUDIO_IN_I2S_WS_GPIO_PORT                              GPIOB
+#define AUDIO_IN_I2S_WS_GPIO_CLK_ENABLE()                      __GPIOB_CLK_ENABLE();
+#define AUDIO_IN_I2S_WS_AF                                     GPIO_AF5_SPI2
   
   /* I2S DMA definitions */
 #define AUDIO_IN_I2S_DMAx_CLK_ENABLE()                          __DMA1_CLK_ENABLE()

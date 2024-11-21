@@ -36,3 +36,4 @@
 "./Middlewares/ST/STM32_USB_Device_Library/Core/usbd_core.o"
 "./Middlewares/ST/STM32_USB_Device_Library/Core/usbd_ctlreq.o"
 "./Middlewares/ST/STM32_USB_Device_Library/Core/usbd_ioreq.o"
+"./algo.o"

@@ -1,12 +1,12 @@
 Application/User/main.o: \
- C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/main.c \
+ D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/main.c \
  ../../../Inc/cube_hal.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../../../Inc/stm32f4xx_hal_conf.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
- ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h \
+ ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
  ../../../../../../../../Drivers/CMSIS/Include/core_cm4.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_version.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h \
@@ -62,7 +62,7 @@ Application/User/main.o: \
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
-../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h:
+../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h:
 ../../../../../../../../Drivers/CMSIS/Include/core_cm4.h:
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_version.h:
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h:

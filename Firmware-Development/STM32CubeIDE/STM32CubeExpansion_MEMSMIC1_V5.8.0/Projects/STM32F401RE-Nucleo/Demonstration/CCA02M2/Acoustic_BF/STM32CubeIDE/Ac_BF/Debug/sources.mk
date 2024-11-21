@@ -31,4 +31,5 @@ Drivers/STM32F4xx_HAL_Driver \
 Middlewares/ST/STM32_Acoustic_BF_Library \
 Middlewares/ST/STM32_USB_Device_Library/Class/Audio-in \
 Middlewares/ST/STM32_USB_Device_Library/Core \
+. \
 

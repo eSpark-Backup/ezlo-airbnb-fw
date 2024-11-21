@@ -2816,7 +2816,8 @@ static void I2S_MspInit(I2S_HandleTypeDef *hi2s)
   /* Enable I2S GPIO clocks */
   AUDIO_IN_I2S_SCK_GPIO_CLK_ENABLE();
   AUDIO_IN_I2S_MOSI_GPIO_CLK_ENABLE();
-  
+  AUDIO_IN_I2S_WS_GPIO_CLK_ENABLE();
+
   /* I2S2 pins configuration: SCK and MOSI pins ------------------------------*/
   GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull      = GPIO_PULLUP;
@@ -2830,6 +2831,11 @@ static void I2S_MspInit(I2S_HandleTypeDef *hi2s)
   GPIO_InitStruct.Alternate = AUDIO_IN_I2S_MOSI_AF;
   HAL_GPIO_Init(AUDIO_IN_I2S_MOSI_GPIO_PORT, &GPIO_InitStruct);
   
+  GPIO_InitStruct.Pull      = GPIO_PULLDOWN;
+  GPIO_InitStruct.Pin       = AUDIO_IN_I2S_WS_PIN ;
+  GPIO_InitStruct.Alternate = AUDIO_IN_I2S_WS_AF;
+  HAL_GPIO_Init(AUDIO_IN_I2S_WS_GPIO_PORT, &GPIO_InitStruct);
+
 } 
 
 static void SPI_MspInit(SPI_HandleTypeDef *hspi)

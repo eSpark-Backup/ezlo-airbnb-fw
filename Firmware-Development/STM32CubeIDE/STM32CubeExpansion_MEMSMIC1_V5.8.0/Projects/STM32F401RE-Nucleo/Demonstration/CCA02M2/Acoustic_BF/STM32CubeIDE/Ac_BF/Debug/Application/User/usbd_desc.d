@@ -1,5 +1,5 @@
 Application/User/usbd_desc.o: \
- C:/Users/Ash/Downloads/x-cube-memsmic1-main/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/usbd_desc.c \
+ D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Projects/STM32F401RE-Nucleo/Demonstration/CCA02M2/Acoustic_BF/Src/usbd_desc.c \
  ../../../../../../../../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
  ../../../Inc/usbd_conf.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
@@ -7,7 +7,7 @@ Application/User/usbd_desc.o: \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
- ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h \
+ ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
  ../../../../../../../../Drivers/CMSIS/Include/core_cm4.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_version.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h \
@@ -52,7 +52,7 @@ Application/User/usbd_desc.o: \
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
-../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h:
+../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h:
 ../../../../../../../../Drivers/CMSIS/Include/core_cm4.h:
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_version.h:
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h:

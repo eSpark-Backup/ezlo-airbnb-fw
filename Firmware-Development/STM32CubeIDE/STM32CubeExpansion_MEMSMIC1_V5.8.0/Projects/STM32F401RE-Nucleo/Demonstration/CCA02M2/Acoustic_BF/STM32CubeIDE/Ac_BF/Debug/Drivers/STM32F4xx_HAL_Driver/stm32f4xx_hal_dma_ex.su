@@ -1,3 +1,3 @@
-C:/Users/Ash/Downloads/x-cube-memsmic1-main/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c:100:19:HAL_DMAEx_MultiBufferStart	8	static
-C:/Users/Ash/Downloads/x-cube-memsmic1-main/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c:154:19:HAL_DMAEx_MultiBufferStart_IT	12	static
-C:/Users/Ash/Downloads/x-cube-memsmic1-main/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c:239:19:HAL_DMAEx_ChangeMemory	0	static
+D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c:100:19:HAL_DMAEx_MultiBufferStart	8	static
+D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c:154:19:HAL_DMAEx_MultiBufferStart_IT	12	static
+D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c:239:19:HAL_DMAEx_ChangeMemory	0	static

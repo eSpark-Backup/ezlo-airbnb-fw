@@ -69,16 +69,16 @@ int main(void)
   SystemClock_Config();
 
   MX_USART2_UART_Init();
-//  /* Initialize USB descriptor basing on channels number and sampling frequency */
-//  USBD_AUDIO_Init_Microphone_Descriptor(&hUSBDDevice, AUDIO_IN_SAMPLING_FREQUENCY, AUDIO_IN_CHANNELS);
-//  /* Init Device Library */
-//  USBD_Init(&hUSBDDevice, &AUDIO_Desc, 0);
-//  /* Add Supported Class */
-//  USBD_RegisterClass(&hUSBDDevice, &USBD_AUDIO);
-//  /* Add Interface callbacks for AUDIO Class */
-//  USBD_AUDIO_RegisterInterface(&hUSBDDevice, &USBD_AUDIO_fops);
-//  /* Start Device Process */
-//  USBD_Start(&hUSBDDevice);
+  /* Initialize USB descriptor basing on channels number and sampling frequency */
+  USBD_AUDIO_Init_Microphone_Descriptor(&hUSBDDevice, AUDIO_IN_SAMPLING_FREQUENCY, AUDIO_IN_CHANNELS);
+  /* Init Device Library */
+  USBD_Init(&hUSBDDevice, &AUDIO_Desc, 0);
+  /* Add Supported Class */
+  USBD_RegisterClass(&hUSBDDevice, &USBD_AUDIO);
+  /* Add Interface callbacks for AUDIO Class */
+  USBD_AUDIO_RegisterInterface(&hUSBDDevice, &USBD_AUDIO_fops);
+  /* Start Device Process */
+  USBD_Start(&hUSBDDevice);
 
   /* Initialize microphone acquisition */
   MicParams.BitsPerSample = 16;

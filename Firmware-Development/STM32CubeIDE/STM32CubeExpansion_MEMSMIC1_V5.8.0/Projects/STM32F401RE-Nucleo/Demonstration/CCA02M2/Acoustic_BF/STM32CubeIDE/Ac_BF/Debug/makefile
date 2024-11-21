@@ -18,6 +18,7 @@ RM := rm -rf
 -include Drivers/BSP/STM32F4xx_Nucleo/subdir.mk
 -include Application/User/subdir.mk
 -include Application/STM4STM32/subdir.mk
+-include subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -67,8 +68,8 @@ all:
 main-build: Ac_BF.elf secondary-outputs
 
 # Tool invocations
-Ac_BF.elf Ac_BF.map: $(OBJS) $(USER_OBJS) C:\Users\Ash\Downloads\x-cube-memsmic1-main\Projects\STM32F401RE-Nucleo\Demonstration\CCA02M2\Acoustic_BF\STM32CubeIDE\Ac_BF\STM32F401RETx_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Ac_BF.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Ash\Downloads\x-cube-memsmic1-main\Projects\STM32F401RE-Nucleo\Demonstration\CCA02M2\Acoustic_BF\STM32CubeIDE\Ac_BF\STM32F401RETx_FLASH.ld" -Wl,-Map="Ac_BF.map" -Wl,--gc-sections -static -L../../../../../../../../Middlewares/ST/STM32_Audio/Addons/PDM/Lib/ -L../../../../../../../../Middlewares/ST/STM32_Audio/Addons/SMR/Lib -L../../../../../../../../Drivers/CMSIS/DSP/Lib/GCC  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Ac_BF.elf Ac_BF.map: $(OBJS) $(USER_OBJS) D:\GitHub\ezlo-airbnb-fw\Firmware-Development\STM32CubeIDE\STM32CubeExpansion_MEMSMIC1_V5.8.0\Projects\STM32F401RE-Nucleo\Demonstration\CCA02M2\Acoustic_BF\STM32CubeIDE\Ac_BF\STM32F401RETx_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Ac_BF.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\GitHub\ezlo-airbnb-fw\Firmware-Development\STM32CubeIDE\STM32CubeExpansion_MEMSMIC1_V5.8.0\Projects\STM32F401RE-Nucleo\Demonstration\CCA02M2\Acoustic_BF\STM32CubeIDE\Ac_BF\STM32F401RETx_FLASH.ld" -Wl,-Map="Ac_BF.map" -Wl,--gc-sections -static -L../../../../../../../../Middlewares/ST/STM32_Audio/Addons/PDM/Lib/ -L../../../../../../../../Middlewares/ST/STM32_Audio/Addons/SMR/Lib -L../../../../../../../../Drivers/CMSIS/DSP/Lib/GCC  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

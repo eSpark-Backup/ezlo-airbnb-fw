@@ -1,0 +1,6 @@
+../algo.c:26:6:a_weighting_a_weighting	1
+../algo.c:31:6:a_weighting_process	1
+../algo.c:37:6:averaging_filter_averaging_filter	1
+../algo.c:44:11:averaging_filter_process	1
+../algo.c:49:6:meterSetup	1
+../algo.c:58:11:meter_process	2

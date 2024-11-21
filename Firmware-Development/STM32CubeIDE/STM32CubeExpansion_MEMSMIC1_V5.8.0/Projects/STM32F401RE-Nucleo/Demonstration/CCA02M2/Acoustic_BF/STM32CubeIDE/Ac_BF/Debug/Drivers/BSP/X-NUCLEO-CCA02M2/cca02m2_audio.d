@@ -1,13 +1,13 @@
 Drivers/BSP/X-NUCLEO-CCA02M2/cca02m2_audio.o: \
- C:/Users/Ash/Downloads/x-cube-memsmic1-main/Drivers/BSP/CCA02M2/cca02m2_audio.c \
- C:/Users/Ash/Downloads/x-cube-memsmic1-main/Drivers/BSP/CCA02M2/cca02m2_audio.h \
+ D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/BSP/CCA02M2/cca02m2_audio.c \
+ D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/BSP/CCA02M2/cca02m2_audio.h \
  ../../../Inc/cca02m2_conf.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../../../Inc/stm32f4xx_hal_conf.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
- ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h \
+ ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
  ../../../../../../../../Drivers/CMSIS/Include/core_cm4.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_version.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h \
@@ -44,14 +44,14 @@ Drivers/BSP/X-NUCLEO-CCA02M2/cca02m2_audio.o: \
  ../../../../../../../../Drivers/BSP/Components/Common/audio.h \
  ../../../../../../../../Drivers/CMSIS/DSP/Include/arm_math.h \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h
-C:/Users/Ash/Downloads/x-cube-memsmic1-main/Drivers/BSP/CCA02M2/cca02m2_audio.h:
+D:/GitHub/ezlo-airbnb-fw/Firmware-Development/STM32CubeIDE/STM32CubeExpansion_MEMSMIC1_V5.8.0/Drivers/BSP/CCA02M2/cca02m2_audio.h:
 ../../../Inc/cca02m2_conf.h:
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../../../Inc/stm32f4xx_hal_conf.h:
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
 ../../../../../../../../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 ../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
-../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h:
+../../../../../../../../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h:
 ../../../../../../../../Drivers/CMSIS/Include/core_cm4.h:
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_version.h:
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_compiler.h:
