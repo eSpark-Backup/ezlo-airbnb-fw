@@ -138,7 +138,7 @@ static int __0099_prepare(void* arg)
         if (user_data)
         {
             memset(user_data, 0, sizeof(s_ezlopi_shtc3_data_t));
-            l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, NULL);
+            l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "SHT");
             if (device)
             {
                 ret = 1;

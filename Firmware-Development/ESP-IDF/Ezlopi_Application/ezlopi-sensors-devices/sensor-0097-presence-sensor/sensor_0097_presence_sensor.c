@@ -65,7 +65,7 @@ int presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *a
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
     {
-        __notify(item);
+        // __notify(item);
         break;
     }
     default:
@@ -96,7 +96,7 @@ static int __notify(l_ezlopi_item_t *item)
     else if ((ezlopi_item_name_motion_direction == item->cloud_properties.item_name) && device_args->target_result.presence)
     { 
         ezlopi_device_value_updated_from_device_broadcast(item);
-        TRACE_W("range %f, angle_azimuth %f, angle_elevation %f, speed, %f", device_args->target_result.range, device_args->target_result.angle_azimuth, device_args->target_result.angle_elevation, device_args->target_result.speed);
+        TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
     }
     
     return ret;
@@ -144,8 +144,13 @@ static void __add_values_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool 
         {
             __add_array_to_object(cj_params, motion_direction_token_vals, 3);
         }
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", ((device_args->target_result.speed < 0) ? motion_direction_token_vals[1] : motion_direction_token_vals[2]));
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", ((device_args->target_result.speed < 0) ? motion_direction_token_vals[1] : motion_direction_token_vals[2]));
+    
+        int motion_direction_index = radar_get_motion_direction(device_args->target_result.speed);
+        const char *motion_direction = motion_direction_token_vals[motion_direction_index];
+    
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", motion_direction);
+        cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", motion_direction);
+        TRACE_W("----------------------- %s", motion_direction);
     }
     if ((ezlopi_item_name_angle_position == item->cloud_properties.item_name) && (scales_north_pole_degress == item->cloud_properties.scale))
     {

@@ -6,6 +6,7 @@
 #include "ezlopi_util_trace.h"
 #include "radar_app.h"
 #include "ezlopi_service_gpioisr.h"
+#include "ezlopi_core_device_value_updated.h"
 // #include "0038_sensor_presence_sensor.h"
 
 #define TAG "radar_app.c"
@@ -525,6 +526,19 @@ esp_err_t initializeRadarTask(l_ezlopi_item_t *item)
     return ret;
 }
 
+#define FALSE_SPEED_VALUES_THRESHOLD 5.0f
+#define SPEED_WALKING_THRESHOLD 1.0f
+
+int radar_get_motion_direction(float speed)
+{
+    if((fabsf(speed) > FALSE_SPEED_VALUES_THRESHOLD) || ((speed < SPEED_WALKING_THRESHOLD) && (speed > -SPEED_WALKING_THRESHOLD)))
+    {
+        return 0;
+    }
+
+    return ((speed < 0) + 1);
+}
+
 void radar_app_loop(void *pvParameters)
 {
     l_ezlopi_item_t *item = pvParameters;
@@ -533,7 +547,32 @@ void radar_app_loop(void *pvParameters)
     while (1)
     {
         esp_err_t error = radar_get_data(device_args);
-        // TRACE_I("%s", esp_err_to_name(error));
+        if(error == ESP_OK)
+        {
+            // TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
+            // TRACE_I("%s", esp_err_to_name(error));
+            static bool presence = 0;
+        
+            if (presence != device_args->target_result.presence && item)
+            {
+                presence = device_args->target_result.presence;
+                ezlopi_device_value_updated_from_device_broadcast(item);
+                TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
+                
+            }   
+            else if (device_args->target_result.presence && item->next)
+            { 
+                static int motion_direction_prev = 0;
+                int motion_direction = radar_get_motion_direction(device_args->target_result.speed);
+                
+                if(motion_direction != motion_direction_prev)
+                {
+                    motion_direction_prev = motion_direction;
+                    ezlopi_device_value_updated_from_device_broadcast(item->next);
+                    TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
+                }
+            }
+        }
         vTaskDelay(50/ portTICK_RATE_MS);
     }
 

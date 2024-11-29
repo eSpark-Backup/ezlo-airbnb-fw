@@ -11,6 +11,8 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 static bool callback_status = false;
 static bme680_data_t bme680_data;
 
+#define SAMPLE_RATE		BSEC_SAMPLE_RATE_LP
+
 /* Entry point for the example */
 void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
 {
@@ -22,6 +24,8 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
         BSEC_OUTPUT_RAW_HUMIDITY,
         BSEC_OUTPUT_RAW_GAS,
         BSEC_OUTPUT_CO2_EQUIVALENT,
+        BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
+        BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY,
         BSEC_OUTPUT_BREATH_VOC_EQUIVALENT,
         BSEC_OUTPUT_STABILIZATION_STATUS,
         BSEC_OUTPUT_RUN_IN_STATUS};
@@ -53,9 +57,22 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
     {
         check_bsec_status();
     }
+    
+    #if 0
+    if (SAMPLE_RATE == BSEC_SAMPLE_RATE_ULP)
+	{
+		bsec2_set_temperature_offset(TEMP_OFFSET_ULP);
+	}
+	else if (SAMPLE_RATE == BSEC_SAMPLE_RATE_LP)
+	{
+		bsec2_set_temperature_offset(TEMP_OFFSET_LP);
+	}
+    #else
+        bsec2_set_temperature_offset(TEMP_OFFSET_LP_AWARE);
+    #endif
 
     /* Subsribe to the desired BSEC2 outputs */
-    bool subscription_status = bsec2_update_subscription(sensor_list, ARRAY_LEN(sensor_list), BSEC_SAMPLE_RATE_LP);
+    bool subscription_status = bsec2_update_subscription(sensor_list, ARRAY_LEN(sensor_list), SAMPLE_RATE);
     // printf("subscription_status is %d\n", subscription_status);
     if (!subscription_status)
     {
@@ -134,9 +151,8 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 
         case BSEC_OUTPUT_RAW_TEMPERATURE:
 #if BME680_TEST
-            printf("\ttemperature = %0.2f\n", output.signal);
+            printf("\ttemperature = %f\n", output.signal);
 #endif
-            bme680_data.temperature = output.signal;
             break;
 
         case BSEC_OUTPUT_RAW_PRESSURE:
@@ -151,7 +167,6 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 #if BME680_TEST
             printf("\thumidity = %0.2f\n", output.signal);
 #endif
-            bme680_data.humidity = output.signal;
             break;
 
         case BSEC_OUTPUT_RAW_GAS:
@@ -160,7 +175,18 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
 #endif
             bme680_data.gas_resistance = output.signal;
             break;
-
+        case BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE:
+#if BME680_TEST
+            printf("\tCompensated temperature = %f\n", output.signal);
+#endif
+            bme680_data.temperature = output.signal;
+            break;
+        case BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY:
+#if BME680_TEST
+            printf("\tCompensated humidity = %0.2f\n", output.signal);
+#endif
+            bme680_data.humidity = output.signal;
+            break;
         case BSEC_OUTPUT_CO2_EQUIVALENT:
 #if BME680_TEST
             printf("\tCO2 Equivalent = %0.2f\n", output.signal);

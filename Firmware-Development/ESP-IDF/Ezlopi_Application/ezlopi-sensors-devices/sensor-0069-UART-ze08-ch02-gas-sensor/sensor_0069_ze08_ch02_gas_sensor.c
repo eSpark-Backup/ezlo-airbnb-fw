@@ -47,23 +47,6 @@ static ezlopi_smoke_t gases;
 static mics6814_t* mics6814;
 static ens160_t* ens160_sensor;
 
-// Function to detect smoke
-static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
-    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm25_standard: %d, gases->pm100_standard: %d",gases->tvoc, gases->eco2, gases->pm25_standard, gases->pm100_standard);
-    return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
-            gases->eco2 > SMOKE_ECO2_THRESHOLD &&
-            gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
-            gases->pm100_standard > SMOKE_PM10_0_THRESHOLD);
-}
-
-// Function to detect vape
-static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
-    TRACE_E("gases->pm10_standard: %d, gases->pm25_standard: %d, gases->pm100_standard : %d, gases->ch2o : %d",gases->pm10_standard, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
-    return (gases->pm10_standard > VAPE_PM1_0_THRESHOLD &&
-            gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
-            gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
-            gases->ch2o > VAPE_CH2O_THRESHOLD );
-}
 /*
 {\
     \"dev_type\": 6,\
@@ -75,6 +58,15 @@ static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
     \"baud\": 9600\
 }\
 */
+
+// Function to detect smoke
+static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
+    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm25_standard: %d, gases->pm100_standard: %d",gases->tvoc, gases->eco2, gases->pm25_standard, gases->pm100_standard);
+    return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
+            gases->eco2 > SMOKE_ECO2_THRESHOLD &&
+            gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
+            gases->pm100_standard > SMOKE_PM10_0_THRESHOLD);
+}
 
 static const char* vape_alarm_token[] = {
     "no_vape_detected",
@@ -94,6 +86,14 @@ static const char* smoke_alarm_token[] = {
     "unknown",
 };
 
+// Function to detect vape
+static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
+    TRACE_E("gases->pm10_standard: %d, gases->pm25_standard: %d, gases->pm100_standard : %d, gases->ch2o : %d",gases->pm10_standard, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
+    return (gases->pm10_standard > VAPE_PM1_0_THRESHOLD &&
+            gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
+            gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
+            gases->ch2o > VAPE_CH2O_THRESHOLD );
+}
 
 int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
 {

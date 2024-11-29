@@ -95,4 +95,6 @@ esp_err_t radar_get_data(s_device_args_t *device_args);
 
 esp_err_t initializeRadarTask(l_ezlopi_item_t *item);
 
+int radar_get_motion_direction(float speed);
+
 #endif // __RADAR_APP_H__

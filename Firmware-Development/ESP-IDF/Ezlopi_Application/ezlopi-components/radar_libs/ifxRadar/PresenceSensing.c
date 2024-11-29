@@ -89,8 +89,8 @@
 #define MIN_DETECTION_RANGE_M_DEFAULT ((ifx_Float_t)0.2) 
 
 
-#define PRESENCE_CONFIRM_COUNT_DEFAULT 7 // 10
-#define ABSENCE_CONFIRM_COUNT_DEFAULT 5 //5
+#define PRESENCE_CONFIRM_COUNT_DEFAULT 5 // 10
+#define ABSENCE_CONFIRM_COUNT_DEFAULT 4 //5
 
 #define THRESHOLD_FACTOR_PRESENCE_PEAK_DEFAULT ((ifx_Float_t)3)
 #define THRESHOLD_FACTOR_ABSENCE_PEAK_DEFAULT  ((ifx_Float_t)4)
@@ -661,10 +661,11 @@ void ifx_presence_sensing_run(ifx_PresenceSensing_t* handle, const ifx_Matrix_R_
         if (isnan(target_signal_strength) || max_val > target_signal_strength)
         {
             const int32_t speed_idx = (int32_t)(IFX_VEC_LEN(handle->doppler_data.abs_result) / 2) - (int32_t)max_idx;
-
             target_signal_strength = max_val;
             target_speed = (ifx_Float_t)speed_idx * handle->speed_resolution_m_s;
             target_distance = (ifx_Float_t)pidx * handle->range_resolution_m;
+            // printf("-----------------------------speed_idx : %d\n", speed_idx);
+            // printf("-----------------------------target_signal_strength : %f\n", target_signal_strength);
         }
     }
     // state machine

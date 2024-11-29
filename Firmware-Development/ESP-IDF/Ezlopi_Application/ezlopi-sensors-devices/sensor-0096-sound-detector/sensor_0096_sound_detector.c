@@ -115,7 +115,10 @@ static void __data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_ob
     }
     printf("\n");
 #endif
-    data->dbSPL = parse_sound_packet(buffer, output_len);
+
+    float dbSPL = parse_sound_packet(buffer, output_len);
+    if(dbSPL)
+        data->dbSPL = dbSPL;
     // TRACE_E("Sound : %0.2fdb SPL", data->dbSPL);
 }
 

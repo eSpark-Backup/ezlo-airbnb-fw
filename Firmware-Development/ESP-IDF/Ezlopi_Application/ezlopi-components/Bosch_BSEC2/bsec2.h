@@ -53,6 +53,10 @@
 #define BSEC_INSTANCE_SIZE                  3272
 #define BSEC_E_INSUFFICIENT_INSTANCE_SIZE   (bsec_library_return_t)-105
 
+#define TEMP_OFFSET_LP		(1.3255f)
+#define TEMP_OFFSET_ULP		(0.466f)
+#define TEMP_OFFSET_LP_AWARE		(5.31f)
+
 #define millis() (esp_timer_get_time()/1000)
 
 typedef bsec_output_t bsec_data;
