@@ -14,6 +14,7 @@ typedef struct ifx_Target_Result_s{
    ifx_Float_t angle_azimuth;       /*!< Azimuth angle of the closest object in degrees, 0 if undefined/absence */
    ifx_Float_t angle_elevation;     /*!< Elevation angle of the closest object in degrees, 0 if undefined/absence */
    ifx_Float_t speed;               /*!< Speed of object in [m/s], 0 if undefined/absence */
+   int direction;
    bool presence;                   /* true : present , false : absent*/
 } ifx_Target_Result_t;
 

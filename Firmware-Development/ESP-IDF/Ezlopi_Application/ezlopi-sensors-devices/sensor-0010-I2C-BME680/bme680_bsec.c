@@ -1,4 +1,5 @@
 #include "bme680_bsec.h"
+#include "ezlopi_util_trace.h"
 
 /**
  * @brief : This function is called by the BSEC library when a new output is available
@@ -238,20 +239,20 @@ void check_bsec_status()
 {
     if (bsec2_get_status() < BSEC_OK)
     {
-        printf("BSEC error code : %d\n", bsec2_get_status());
+        TRACE_E("BSEC error code : %d", bsec2_get_status());
     }
     else if (bsec2_get_status() > BSEC_OK)
     {
-        printf("BSEC warning code : %d\n", bsec2_get_status());
+        TRACE_W("BSEC warning code : %d", bsec2_get_status());
     }
 
     if (bsec2_get_sensor_status() < BME68X_OK)
     {
-        printf("BME68X error code : %d\n", bsec2_get_sensor_status());
+        TRACE_E("BME68X error code : %d", bsec2_get_sensor_status());
     }
     else if (bsec2_get_sensor_status() > BME68X_OK)
     {
-        printf("BME68X warning code : 0x%X\n", bsec2_get_sensor_status());
+        TRACE_W("BME68X warning code : 0x%X", bsec2_get_sensor_status());
     }
 }
 

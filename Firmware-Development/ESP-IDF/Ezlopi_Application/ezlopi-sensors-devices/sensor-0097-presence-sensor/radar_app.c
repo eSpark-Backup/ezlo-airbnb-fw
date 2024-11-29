@@ -529,14 +529,19 @@ esp_err_t initializeRadarTask(l_ezlopi_item_t *item)
 #define FALSE_SPEED_VALUES_THRESHOLD 5.0f
 #define SPEED_WALKING_THRESHOLD 1.0f
 
-int radar_get_motion_direction(float speed)
+int radar_get_motion_direction(float range)
 {
-    if((fabsf(speed) > FALSE_SPEED_VALUES_THRESHOLD) || ((speed < SPEED_WALKING_THRESHOLD) && (speed > -SPEED_WALKING_THRESHOLD)))
+    int index = 0;
+    static float range_prev = 0.0f;
+    float delta = range_prev - range;
+
+    if (fabsf(delta) > 0.5)
     {
-        return 0;
+        range_prev = range;
+        index = (delta < 0) + 1;
     }
 
-    return ((speed < 0) + 1);
+    return index;
 }
 
 void radar_app_loop(void *pvParameters)
@@ -550,7 +555,14 @@ void radar_app_loop(void *pvParameters)
         if(error == ESP_OK)
         {
             // TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
+            // printf("%f, %f\r\n", device_args->target_result.range, device_args->target_result.speed);
             // TRACE_I("%s", esp_err_to_name(error));
+            // static const char *motion_direction_token_vals[3] = {
+            //     "unknown",
+            //     "incoming",
+            //     "outgoing",
+            // };
+            // printf("%s\n", motion_direction_token_vals[radar_get_motion_direction(device_args->target_result.range)]);
             static bool presence = 0;
         
             if (presence != device_args->target_result.presence && item)
@@ -560,14 +572,16 @@ void radar_app_loop(void *pvParameters)
                 TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
                 
             }   
-            else if (device_args->target_result.presence && item->next)
+
+            if (device_args->target_result.presence)
             { 
                 static int motion_direction_prev = 0;
-                int motion_direction = radar_get_motion_direction(device_args->target_result.speed);
+                int motion_direction = radar_get_motion_direction(device_args->target_result.range);
                 
-                if(motion_direction != motion_direction_prev)
+                if((motion_direction != motion_direction_prev) && item->next)
                 {
                     motion_direction_prev = motion_direction;
+                    device_args->target_result.direction = motion_direction;
                     ezlopi_device_value_updated_from_device_broadcast(item->next);
                     TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
                 }

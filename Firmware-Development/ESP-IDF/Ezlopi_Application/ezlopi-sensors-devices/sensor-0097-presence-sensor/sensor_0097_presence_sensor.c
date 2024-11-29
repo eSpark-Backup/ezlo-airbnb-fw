@@ -145,8 +145,7 @@ static void __add_values_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool 
             __add_array_to_object(cj_params, motion_direction_token_vals, 3);
         }
     
-        int motion_direction_index = radar_get_motion_direction(device_args->target_result.speed);
-        const char *motion_direction = motion_direction_token_vals[motion_direction_index];
+        const char *motion_direction = motion_direction_token_vals[device_args->target_result.direction];
     
         cJSON_AddStringToObject(__FUNCTION__, cj_params, "valueFormatted", motion_direction);
         cJSON_AddStringToObject(__FUNCTION__, cj_params, "value", motion_direction);
