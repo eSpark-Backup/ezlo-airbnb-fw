@@ -82,7 +82,8 @@ static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
     return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
             gases->eco2 > SMOKE_ECO2_THRESHOLD &&
             gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
-            gases->pm100_standard > SMOKE_PM10_0_THRESHOLD);
+            gases->pm100_standard > SMOKE_PM10_0_THRESHOLD &&
+            gases->ch2o > VAPE_CH2O_THRESHOLD );
 }
 
 static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
@@ -90,7 +91,7 @@ static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
     return (gases->pm10_standard > VAPE_PM1_0_THRESHOLD &&
             gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
             gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
-            gases->ch2o > VAPE_CH2O_THRESHOLD );
+            gases->ch2o < VAPE_CH2O_THRESHOLD );
 }
 
 int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)

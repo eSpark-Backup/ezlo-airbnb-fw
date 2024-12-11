@@ -57,6 +57,8 @@ extern "C"
     uint8_t ezlopi_nvs_read_bool(bool *b, const char *key_name);
     uint8_t ezlopi_nvs_write_float32(float f, const char *key_name);
     uint8_t ezlopi_nvs_read_float32(float *f, const char *key_name);
+    int ezlopi_nvs_read_blob(const uint8_t* data, uint32_t len, const char* nvs_name);
+    int ezlopi_nvs_write_blob(const uint8_t* data, uint32_t len, const char* nvs_name);
 
     char *ezlopi_nvs_scene_get_v2(void);
     int ezlopi_nvs_scene_set_v2(char *scene);

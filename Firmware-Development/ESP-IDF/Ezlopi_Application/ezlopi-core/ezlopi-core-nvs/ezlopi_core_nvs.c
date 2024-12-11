@@ -898,3 +898,58 @@ uint8_t EZPI_CORE_nvs_read_serial_log_severity(uint32_t* severity)
 
     return ret;
 }
+
+int ezlopi_nvs_read_blob(const uint8_t* data, uint32_t len, const char* nvs_name)
+{
+    int ret = 0;
+    if (data && nvs_name && len)
+    {
+        if (1 == ezlopi_nvs_init())
+        {
+            esp_err_t err = ESP_FAIL;
+            size_t required_size = 0;
+            err = nvs_get_blob(ezlopi_nvs_handle, nvs_name, NULL, &required_size);
+            if (err == ESP_ERR_NVS_NOT_FOUND || len < required_size) {
+                TRACE_E("'nvs_get_blob' read-length error!, Required: %d | %d, Error: %s", required_size, len, esp_err_to_name(err));
+                return 0;
+            }
+
+            err = nvs_get_blob(ezlopi_nvs_handle, nvs_name, data, &required_size);
+            TRACE_W("(nvs_get_blob)-%s:: error: %s", nvs_name, esp_err_to_name(err));
+            if (err == ESP_OK) {
+                ret = 1;
+            }
+        }
+    }
+
+    return ret;
+}
+
+int ezlopi_nvs_write_blob(const uint8_t* data, uint32_t len, const char* nvs_name)
+{
+    int ret = 0;
+
+    if (data && nvs_name && len)
+    {
+        if (1 == ezlopi_nvs_init())
+        {
+            esp_err_t err = ESP_FAIL;
+            
+            err = nvs_set_blob(ezlopi_nvs_handle, nvs_name, data, len);
+            TRACE_W("ezlopi_nvs_write_user_id_str - error: %s", esp_err_to_name(err));
+
+            if (ESP_OK == err)
+            {
+                err = nvs_commit(ezlopi_nvs_handle);
+                TRACE_W("ezlopi_nvs_write_blob: %s - error: %s", nvs_name, esp_err_to_name(err));
+
+                if (ESP_OK == err)
+                {
+                    ret = 1;
+                }
+            }
+        }
+    }
+
+    return ret;
+}

@@ -117,7 +117,7 @@ void bme68xlib_setup(s_ezlopi_i2c_master_t* bme68x_i2c_master_conf)
 	last_op_mode = BME68X_SLEEP_MODE;
 
 	memcpy(&g_bme68x_i2c_master_conf, bme68x_i2c_master_conf, sizeof(s_ezlopi_i2c_master_t));
-	ezlopi_i2c_master_init(&g_bme68x_i2c_master_conf);
+	// ezlopi_i2c_master_init(&g_bme68x_i2c_master_conf);
 }
 
 /**

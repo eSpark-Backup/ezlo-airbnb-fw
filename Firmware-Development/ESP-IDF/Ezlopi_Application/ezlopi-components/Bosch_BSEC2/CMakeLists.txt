@@ -1,6 +1,6 @@
 
     idf_component_register(SRCS "bsec2.c" 
-                        INCLUDE_DIRS "bsec_interface" "."
+                        INCLUDE_DIRS "bsec_interface" "config/bme680/bme680_iaq_33v_3s_4d" "."
                         REQUIRES BME68x_Sensor_library)
 
     if(CONFIG_IDF_TARGET_ESP32S3)

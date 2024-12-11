@@ -8,8 +8,10 @@
 #define BME680_SCL GPIO_NUM_17
 #define ACTIVE_I2C I2C_NUM_0
 
-#define BME680_TEST 0
+#define BME680_TEST 1
 #define SEALEVELPRESSURE_HPA (1013.25)
+
+#define STATE_SAVE_PERIOD UINT32_C (10 * 60 * 1000) /* 360 minutes - 4 times a day */
 
 typedef struct
 {

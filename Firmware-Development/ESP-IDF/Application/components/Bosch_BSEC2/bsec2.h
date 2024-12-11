@@ -44,6 +44,8 @@
 #include "bsec_datatypes.h"
 #include "bsec_interface_multi.h"
 
+#define TEMP_OFFSET_LP_AWARE		(5.31f)
+
 #ifndef ARRAY_LEN
 #define ARRAY_LEN(array)				(sizeof(array)/sizeof(array[0]))
 #endif

@@ -1,5 +1,15 @@
 #include "bme680_bsec.h"
 #include "ezlopi_util_trace.h"
+#include "ezlopi_core_nvs.h"
+
+uint8_t bsec_state[BSEC_MAX_STATE_BLOB_SIZE]; // Define the state buffer
+const uint8_t bsec_config[] = { 
+    #include "bsec_iaq.txt" 
+};
+
+static bool load_state(void);
+static bool save_state(void);
+static void update_bsec_state(void);
 
 /**
  * @brief : This function is called by the BSEC library when a new output is available
@@ -59,6 +69,16 @@ void bme680_setup(uint32_t sda, uint32_t scl, bool initialize_i2c)
         check_bsec_status();
     }
     
+    if (!bsec2_set_config(bsec_config))
+    {
+        check_bsec_status();
+    }
+
+    if (!load_state())
+    {
+        check_bsec_status();
+    }
+
     #if 0
     if (SAMPLE_RATE == BSEC_SAMPLE_RATE_ULP)
 	{
@@ -220,6 +240,8 @@ static void bme680_data_callback(const bme68x_data data, const bsec_outputs outp
             break;
         }
     }
+
+    update_bsec_state();
 }
 
 float bme680_read_altitude(float pressure, float seaLevel)
@@ -281,4 +303,45 @@ bool bme680_print_data(bme680_data_t *data)
 bool get_data_status()
 {
     return callback_status;
+}
+
+bool load_state(void)
+{
+    if(!ezlopi_nvs_read_blob(bsec_state, BSEC_MAX_STATE_BLOB_SIZE, "bsec_state"))
+    {
+        return false;
+    }
+
+    dump("bsec_state", bsec_state, 0, BSEC_MAX_STATE_BLOB_SIZE);
+
+    // Set the state in the BSEC library
+    return bsec2_set_state(bsec_state);
+}
+
+bool save_state(void)
+{
+    if (!bsec2_get_state(bsec_state)) {
+        TRACE_E("Failed to retrieve BSEC state\n");
+        return false;
+    }
+
+    dump("bsec_state", bsec_state, 0, BSEC_MAX_STATE_BLOB_SIZE);
+
+    return ezlopi_nvs_write_blob(bsec_state, BSEC_MAX_STATE_BLOB_SIZE, "bsec_state");
+}
+
+void update_bsec_state(void)
+{
+    static uint16_t state_update_counter = 0;
+    bool update = false;
+
+    if (!state_update_counter || (state_update_counter * STATE_SAVE_PERIOD) < millis())
+    {
+        /* Update every STATE_SAVE_PERIOD minutes */
+        update = true;
+        state_update_counter++;
+    }
+
+    if (update && !save_state())
+        check_bsec_status();
 }

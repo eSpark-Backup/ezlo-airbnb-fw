@@ -59,9 +59,9 @@ static void app_loop(void *pvParameters)
 void app_main(void)
 {
     PM25_AQI_Data data;
-    xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
-    vTaskDelete(NULL);
-    return;
+    // xTaskCreate(app_loop, "app_loop", 2 * 2048, NULL, 10, NULL);
+    // vTaskDelete(NULL);
+    // return;
     pms_init(&data);
 #if MICS6814_SENSOR
     mics6814_t mics6814;
@@ -105,6 +105,7 @@ void app_main(void)
     dfrobot_ens160_set_pwr_mode(&ens160_sensor, ENS160_STANDARD_MODE);
     dfrobot_ens160_set_temp_and_hum(&ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0);
 #endif
+    bme680_setup(18, 17, false);
     // pca9536_init(&spi_handle);
 
     // if (!pca9536_begin()){
@@ -131,7 +132,7 @@ void app_main(void)
 #endif
 
     // ESP_ERROR_CHECK(bme680_init());
-    printf("aqi,tvoc(ppb),eco2(ppm),ch2o(ppm),PM 1.0,PM 2.5,PM 10,no2,nh3,co\n");
+    printf("aqi,tvoc(ppb),eco2(ppm),ch2o(ppm),PM 1.0,PM 2.5,PM 10,no2,nh3,co,co2,voc,iaq,iaq_accuracy\n");
     vTaskDelay(3000/portTICK_RATE_MS);
     while (1)
     {
@@ -169,13 +170,16 @@ void app_main(void)
         // float c2h5oh = mics6814_get_gas(&mics6814, MICS6814_GAS_C2H5OH);
         printf("%0.2f,", no2);
         printf("%0.2f,", nh3);
-        printf("%0.2f\n", co);
+        printf("%0.2f,", co);
         // printf("c3h8 = %0.2f\n", c3h8);
         // printf("c4h10 = %0.2f\n", c4h10);
         // printf("ch4 = %0.2f\n", ch4);
         // printf("h2 = %0.2f\n", h2);
         // printf("c2h5oh = %0.2f\n", c2h5oh);
 #endif
+    bme680_data_t user_data;
+    bme680_get_data(&user_data);
+    printf("%0.2f,%0.2f,%0.2f,%d\n", user_data.co2_equivalent, user_data.voc_equivalent, user_data.iaq, user_data.iaq_accuracy);
         vTaskDelay(200 / portTICK_RATE_MS);
     }
 }
