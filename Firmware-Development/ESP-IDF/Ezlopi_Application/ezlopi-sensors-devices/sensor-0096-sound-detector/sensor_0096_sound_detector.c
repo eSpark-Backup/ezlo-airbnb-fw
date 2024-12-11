@@ -117,9 +117,9 @@ static void __data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_ob
 #endif
 
     float dbSPL = parse_sound_packet(buffer, output_len);
+    TRACE_E("Sound : %0.2fdb SPL", data->dbSPL);
     if(dbSPL)
         data->dbSPL = dbSPL;
-    // TRACE_E("Sound : %0.2fdb SPL", data->dbSPL);
 }
 
 static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
@@ -178,7 +178,9 @@ static void app_loop(void *pvParameters)
                     #endif
                 }
 
-                data->dbSPL = parse_sound_packet(buffer, len);
+                float spl = parse_sound_packet(buffer, len);
+                if(spl)
+                    data->dbSPL = spl;
             }
             vTaskDelay(100 / portTICK_RATE_MS);
         }
