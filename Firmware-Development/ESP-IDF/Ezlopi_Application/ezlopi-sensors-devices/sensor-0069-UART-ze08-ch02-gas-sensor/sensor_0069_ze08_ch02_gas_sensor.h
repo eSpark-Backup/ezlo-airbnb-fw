@@ -20,7 +20,7 @@
 #define VAPE_PM10_0_THRESHOLD 600 
 #define VAPE_PM2_5_THRESHOLD 600
 #define VAPE_PM1_0_THRESHOLD 600
-#define VAPE_CH2O_THRESHOLD 4000
+#define VAPE_CH2O_THRESHOLD 500
 
 typedef struct ezlopi_smoke
 {
