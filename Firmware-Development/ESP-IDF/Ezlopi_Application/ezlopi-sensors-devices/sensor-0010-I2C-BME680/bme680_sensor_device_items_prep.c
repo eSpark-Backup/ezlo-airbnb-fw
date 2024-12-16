@@ -45,7 +45,7 @@ static void __prepare_cloud_item_properties_temperature(l_ezlopi_item_t* item, c
     __prepare_item_cloud_properties(item, cj_device, user_arg);
     item->cloud_properties.item_name = ezlopi_item_name_temp;
     item->cloud_properties.value_type = value_type_temperature;
-    item->cloud_properties.scale = scales_celsius;
+    item->cloud_properties.scale = scales_fahrenheit;
     
     item->is_user_arg_unique = true;
     item->interface.i2c_master.enable = true;

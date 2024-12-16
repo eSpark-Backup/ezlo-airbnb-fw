@@ -135,7 +135,8 @@ static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
             {
                 if (ezlopi_item_name_temp == item->cloud_properties.item_name)
                 {
-                    ezlopi_valueformatter_float_to_cjson(cj_device, user_data->temperature, item->cloud_properties.scale);
+                    float fahrenheit = (user_data->temperature * (9.0/5.0)) + 32; // celcius to fahrenheit
+                    ezlopi_valueformatter_float_to_cjson(cj_device, fahrenheit, item->cloud_properties.scale);
                 }
                 else if (ezlopi_item_name_humidity == item->cloud_properties.item_name)
                 {
