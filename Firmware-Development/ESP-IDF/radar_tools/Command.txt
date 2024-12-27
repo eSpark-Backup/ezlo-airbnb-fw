@@ -1,0 +1,1 @@
+./bgt60-configurator-cli -c airbnb-v1.0.4.json -o airbnb-v1.0.4.h

@@ -1,0 +1,7 @@
+
+This software component is provided to you as part of a software package and
+applicable license terms are in the  Package_license file. If you received this
+software component outside of a package or without applicable license terms,
+the terms of the GPLv3 license shall apply. 
+You may obtain a copy of the GPLv3 at:
+[https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html)

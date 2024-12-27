@@ -1,0 +1,6 @@
+../algo.c:26:6:a_weighting_a_weighting	0	static
+../algo.c:31:6:a_weighting_process	8	static
+../algo.c:37:6:averaging_filter_averaging_filter	16	static
+../algo.c:44:11:averaging_filter_process	0	static
+../algo.c:49:6:meterSetup	16	static
+../algo.c:58:11:meter_process	96	static

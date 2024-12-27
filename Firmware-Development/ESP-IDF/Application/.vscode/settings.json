@@ -1,0 +1,18 @@
+{
+    "idf.adapterTargetName": "esp32s3",
+    "files.associations": {
+        "ezlopi_i2c_master.h": "c",
+        "ch20_sensor.h": "c",
+        "xstring": "c",
+        "xutility": "c",
+        "initializer_list": "c",
+        "type_traits": "c",
+        "xmemory0": "c",
+        "ze08-ch2o.h": "c",
+        "string.h": "c",
+        "pms5003.h": "c",
+        "software_serial.h": "c"
+    },
+    "idf.portWin": "COM6",
+    "idf.flashType": "UART"
+}
