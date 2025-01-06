@@ -26,7 +26,6 @@
 #include "ezlopi_service_webprov.h"
 #include "ezlopi_core_broadcast.h"
 #include "ezlopi_core_processes.h"
-#include "ezlopi_core_errors.h"
 
 static void __ota_loop(void *arg);
 
@@ -42,10 +41,10 @@ void ezlopi_service_ota_init(void)
 
 static void __ota_loop(void *arg)
 {
-    if (EZPI_SUCCESS == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
+    if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_WIFI_CONNECTED, 0, false))
     {
         TRACE_E("OTA - Got WiFi Event. ");
-        if (EZPI_SUCCESS == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
+        if (1 == ezlopi_event_group_wait_for_event(EZLOPI_EVENT_NMA_REG, 0, false))
         {
             TRACE_D("OTA - Got reg event.");
             static uint32_t __ota_time_stamp = 0;
@@ -55,8 +54,9 @@ static void __ota_loop(void *arg)
             {
                 __ota_time_stamp = xTaskGetTickCount();
                 cJSON *cj_firmware_info_request = firmware_send_firmware_query_to_nma_server(esp_random());
-
-                if (EZPI_SUCCESS != ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
+                TRACE_E("Crashing Here-------------");
+                vTaskDelay(100/portTICK_RATE_MS);
+                if (0 == ezlopi_core_broadcast_add_to_queue(cj_firmware_info_request))
                 {
                     cJSON_Delete(__FUNCTION__, cj_firmware_info_request);
                 }
@@ -80,7 +80,7 @@ static void ota_service_process(void* pv)
         TRACE_D("Configuration Selection NMA Reg: %d", ret_nma_reg);
         TRACE_D("Configuration Selection OTA Trigger : %d", ret_ota);
 
-        if ((EZPI_SUCCESS != ret_nma_reg) || (EZPI_SUCCESS != ret_ota))
+        if ((1 != ret_nma_reg) || (1 != ret_ota))
         {
             TRACE_D("Sending firmware check request...");
             // uint32_t message_counter = ezlopi_service_web_provisioning_get_message_count();

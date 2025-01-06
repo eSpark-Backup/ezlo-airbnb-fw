@@ -498,7 +498,7 @@ char *ezlopi_factory_info_v3_get_provisioning_server(void)
 
 const char *ezlopi_factory_info_v3_get_device_type(void)
 {
-    return "ezlopi_generic";
+    return "ezlopi_device_aware";
 }
 
 void ezlopi_factory_info_v3_free_ca_certificate(void)
