@@ -33,16 +33,16 @@ static int __settings_sensor_0096_sound_detector_setting_initialize_broadcast_in
 
     if (device)
     {
-        device_setting = ezlopi_device_add_settings_to_device_v3(device, __settings_callback);
+        device_setting = EZPI_core_device_add_settings_to_device_v3(device, __settings_callback);
         if (device_setting)
         {
             s_sensor_sound_detector_setting_broadcast_interval_t *broadcast_interval = (s_sensor_sound_detector_setting_broadcast_interval_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_sensor_sound_detector_setting_broadcast_interval_t));
             if (broadcast_interval)
             {
                 memset(broadcast_interval, 0, sizeof(s_sensor_sound_detector_setting_broadcast_interval_t));
-                float read_value = 0;
-                uint8_t error = ezlopi_nvs_read_uint32(&read_value, nvs_key_sound_detector_sensor_broadcast_interval_setting);
-                if (1 == error)
+                uint32_t read_value = 0;
+                ezlopi_error_t error = EZPI_core_nvs_read_uint32(&read_value, nvs_key_sound_detector_sensor_broadcast_interval_setting);
+                if (EZPI_SUCCESS == error)
                 {
                     TRACE_D("Setting already exist");
                     broadcast_interval->broadcast_interval = read_value;
@@ -51,7 +51,7 @@ static int __settings_sensor_0096_sound_detector_setting_initialize_broadcast_in
                 {
                     TRACE_W("Not found saved setting for broadcast interval.");
                     broadcast_interval->broadcast_interval = BROADCAST_INTERVAL_DEFAULT;
-                    if (!ezlopi_nvs_write_uint32(broadcast_interval->broadcast_interval, nvs_key_sound_detector_sensor_broadcast_interval_setting))
+                    if (EZPI_SUCCESS != EZPI_core_nvs_write_uint32(broadcast_interval->broadcast_interval, nvs_key_sound_detector_sensor_broadcast_interval_setting))
                     {
                         TRACE_E("Failed to write to NVS");
                         ret = 1;
@@ -181,7 +181,7 @@ static int __settings_set_sound_detector_sensor_broadcast_interval_get(void *arg
         if ((l_broadcast_interval >= BROADCAST_INTERVAL_MIN) && (l_broadcast_interval <= BROADCAST_INTERVAL_MAX))
         {
             broadcast_interval->broadcast_interval = l_broadcast_interval;
-            if (!ezlopi_nvs_write_uint32(broadcast_interval->broadcast_interval, nvs_key_sound_detector_sensor_broadcast_interval_setting))
+            if (EZPI_SUCCESS != EZPI_core_nvs_write_uint32(broadcast_interval->broadcast_interval, nvs_key_sound_detector_sensor_broadcast_interval_setting))
             {
                 TRACE_E("Failed to write to NVS");
                 ret = 1;
@@ -206,7 +206,7 @@ static int __settings_set(void *arg, l_ezlopi_device_settings_v3_t *setting)
     ESP_ERROR_CHECK(__settings_set_sound_detector_sensor_broadcast_interval_get(arg, setting));
     setting_changed = true;
 
-    ezlopi_core_device_value_updated_settings_broadcast(setting);
+    EZPI_core_device_value_updated_settings_broadcast(setting);
     // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
 }
@@ -253,7 +253,7 @@ static int __settings_reset_sound_detector_sensor_broadcast_interval_get(void *a
     if (cj_properties && broadcast_interval)
     {
         broadcast_interval->broadcast_interval = BROADCAST_INTERVAL_DEFAULT;
-        if (!ezlopi_nvs_write_uint32(broadcast_interval->broadcast_interval, nvs_key_sound_detector_sensor_broadcast_interval_setting))
+        if (EZPI_SUCCESS != EZPI_core_nvs_write_uint32(broadcast_interval->broadcast_interval, nvs_key_sound_detector_sensor_broadcast_interval_setting))
         {
             TRACE_E("Failed to write to NVS");
             ret = 1;
@@ -273,7 +273,7 @@ static int __settings_reset(void *arg, l_ezlopi_device_settings_v3_t *setting)
     ESP_ERROR_CHECK(__settings_reset_sound_detector_sensor_broadcast_interval_get(arg, setting));
     setting_changed = true;
 
-    ezlopi_core_device_value_updated_settings_broadcast(setting);
+    EZPI_core_device_value_updated_settings_broadcast(setting);
     // ezlopi_cloud_settings_updated_from_devices_v3(NULL, setting);
     return ret;
 }

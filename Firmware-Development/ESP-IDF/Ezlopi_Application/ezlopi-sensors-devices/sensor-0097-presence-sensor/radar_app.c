@@ -568,7 +568,7 @@ void radar_app_loop(void *pvParameters)
             if (presence != device_args->target_result.presence && item)
             {
                 presence = device_args->target_result.presence;
-                ezlopi_device_value_updated_from_device_broadcast(item);
+                EZPI_core_device_value_updated_from_device_broadcast(item);
                 TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
                 
             }   
@@ -582,7 +582,7 @@ void radar_app_loop(void *pvParameters)
                 {
                     motion_direction_prev = motion_direction;
                     device_args->target_result.direction = motion_direction;
-                    ezlopi_device_value_updated_from_device_broadcast(item->next);
+                    EZPI_core_device_value_updated_from_device_broadcast(item->next);
                     TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
                 }
             }

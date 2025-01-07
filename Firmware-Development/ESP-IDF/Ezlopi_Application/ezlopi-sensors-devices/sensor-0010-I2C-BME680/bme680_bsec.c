@@ -307,7 +307,7 @@ bool get_data_status()
 
 bool load_state(void)
 {
-    if(!ezlopi_nvs_read_blob(bsec_state, BSEC_MAX_STATE_BLOB_SIZE, "bsec_state"))
+    if(EZPI_SUCCESS != EZPI_core_nvs_read_blob(bsec_state, BSEC_MAX_STATE_BLOB_SIZE, "bsec_state"))
     {
         return false;
     }
@@ -327,7 +327,7 @@ bool save_state(void)
 
     dump("bsec_state", bsec_state, 0, BSEC_MAX_STATE_BLOB_SIZE);
 
-    return ezlopi_nvs_write_blob(bsec_state, BSEC_MAX_STATE_BLOB_SIZE, "bsec_state");
+    return (EZPI_SUCCESS == EZPI_core_nvs_write_blob(bsec_state, BSEC_MAX_STATE_BLOB_SIZE, "bsec_state"));
 }
 
 void update_bsec_state(void)

@@ -17,6 +17,6 @@ typedef struct stm32_sound_intensity
     float dbSPL;
 } stm32_sound_intensity_t;
 
-int sensor_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t SENSOR_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0096_SOUND_DETECTOR_H_

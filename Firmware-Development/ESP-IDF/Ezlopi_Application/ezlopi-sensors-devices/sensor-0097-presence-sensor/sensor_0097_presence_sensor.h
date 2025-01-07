@@ -17,7 +17,7 @@
 
 #include "radar_app.h"
 
-int presence_sensor_dev_item_prep(s_ezlopi_prep_arg_t *prep_args, s_device_args_t *device_args);
-int presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+ezlopi_error_t presence_sensor_dev_item_prep(s_ezlopi_prep_arg_t *prep_args, s_device_args_t *device_args);
+ezlopi_error_t SENSOR_0097_presence_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // __SENSOR_0097_PRESENCE_SENSOR_H__

@@ -116,7 +116,7 @@ esp_err_t ads101x_init(ads101x_t *const me, ads101x_model_t model, gpio_num_t in
 	// 	return ret;
 	// }
 
-	ezlopi_i2c_master_init(me->ezlopi_i2c);
+	EZPI_hal_i2c_master_init(me->ezlopi_i2c);
 
 	/**/
 	// me->i2c_dev = &i2c_bus->devs.dev[i2c_bus->devs.num - 1]; /* todo: write function to get the dev from name */
@@ -562,8 +562,8 @@ static int8_t i2c_read(uint8_t reg_addr, uint16_t *reg_data, void *intf) {
 	uint8_t buf[2] = {0};
 	
 	// ret =  dev->read(&reg_addr, 1, buf, 2, dev);
-	ret = ezlopi_i2c_master_write_to_device(i2c_master_conf, &reg_addr, sizeof(reg_addr));
-	ret = ezlopi_i2c_master_read_from_device(i2c_master_conf, buf, sizeof(buf));
+	ret = EZPI_hal_i2c_master_write_to_device(i2c_master_conf, &reg_addr, sizeof(reg_addr));
+	ret = EZPI_hal_i2c_master_read_from_device(i2c_master_conf, buf, sizeof(buf));
 
 	if (ret != ESP_OK) {
 		return ret;
@@ -587,7 +587,7 @@ static int8_t i2c_write(uint8_t reg_addr, const uint16_t reg_data,
 			(uint8_t)(reg_data & 0x00FF)};
 
 	// ret = dev->write(&reg_addr, 1, buf, 2, dev);
-	ret = ezlopi_i2c_master_write_to_device(i2c_master_conf, buf, sizeof(buf));
+	ret = EZPI_hal_i2c_master_write_to_device(i2c_master_conf, buf, sizeof(buf));
 
 	if (ret != ESP_OK) {
 		return ret;

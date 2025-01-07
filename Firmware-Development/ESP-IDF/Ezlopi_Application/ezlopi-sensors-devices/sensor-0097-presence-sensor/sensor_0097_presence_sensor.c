@@ -29,38 +29,38 @@ static const char *motion_direction_token_vals[3] = {
 // DMA_ATTR static uint16_t samples_buf1[TOTAL_DATA * 2];
 // DMA_ATTR static uint16_t samples_buf2[TOTAL_DATA * 2];
 
-static int __prepare(void *arg);
-static int __init(l_ezlopi_item_t *item);
-static int __notify(l_ezlopi_item_t *item);
-static int __get_hub_item(l_ezlopi_item_t *item, void *args);
-static int __get_cjson_ezlopi_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __prepare(void *arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_hub_item(l_ezlopi_item_t *item, void *args);
+static ezlopi_error_t __get_cjson_ezlopi_value(l_ezlopi_item_t *item, void *arg);
 
 static int32_t radar_get_fifo_data(s_device_args_t *device_args);
 
-int presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0097_presence_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     // TRACE_E("%s", ezlopi_actions_to_string(action));
     switch (action)
     {
     case EZLOPI_ACTION_PREPARE:
     {
-        __prepare(arg);
+        ret = __prepare(arg);
         break;
     }
     case EZLOPI_ACTION_INITIALIZE:
     {
-        __init(item);
+        ret = __init(item);
         break;
     }
     case EZLOPI_ACTION_HUB_GET_ITEM:
     {
-        __get_hub_item(item, arg);
+        ret = __get_hub_item(item, arg);
         break;
     }
     case EZLOPI_ACTION_GET_EZLOPI_VALUE:
     {
-        __get_cjson_ezlopi_value(item, arg);
+        ret = __get_cjson_ezlopi_value(item, arg);
         break;
     }
     case EZLOPI_ACTION_NOTIFY_1000_MS:
@@ -77,9 +77,9 @@ int presence_sensor_v3(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *a
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     s_device_args_t *device_args = (s_device_args_t *) item->user_arg;
 
@@ -90,13 +90,15 @@ static int __notify(l_ezlopi_item_t *item)
     if (ezlopi_item_name_presence == item->cloud_properties.item_name && presence != device_args->target_result.presence)
     {
         presence = device_args->target_result.presence;
-        ezlopi_device_value_updated_from_device_broadcast(item);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
+        ret = EZPI_SUCCESS;
         
     }   
     else if ((ezlopi_item_name_motion_direction == item->cloud_properties.item_name) && device_args->target_result.presence)
     { 
-        ezlopi_device_value_updated_from_device_broadcast(item);
         TRACE_W("range %f, speed, %f", device_args->target_result.range, device_args->target_result.speed);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
+        ret = EZPI_SUCCESS;
     }
     
     return ret;
@@ -165,35 +167,37 @@ static void __add_values_to_cjson(l_ezlopi_item_t *item, cJSON *cj_params, bool 
     }
 }
 
-static int __get_hub_item(l_ezlopi_item_t *item, void *args)
+static ezlopi_error_t __get_hub_item(l_ezlopi_item_t *item, void *args)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     cJSON *cj_params = (cJSON *)args;
     if (cj_params)
     {
         __add_values_to_cjson(item, cj_params, true);
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __get_cjson_ezlopi_value(l_ezlopi_item_t *item, void *arg)
+static ezlopi_error_t __get_cjson_ezlopi_value(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
     cJSON *cj_params = (cJSON *)arg;
     if (cj_params)
     {
         __add_values_to_cjson(item, cj_params, false);
+        ret = EZPI_SUCCESS;
     }
 
     return ret;
 }
 
-static int __init(l_ezlopi_item_t *item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
 
     if (item && item->user_arg)
     {
@@ -204,7 +208,7 @@ static int __init(l_ezlopi_item_t *item)
             if(ESP_OK == initializeRadarTask(item))
             {
                 TRACE_I("'radar_app_init' OK");
-                ret = 1;
+                ret = EZPI_SUCCESS;
             }
         }
         else
@@ -216,9 +220,9 @@ static int __init(l_ezlopi_item_t *item)
     return ret;
 }
 
-static int __prepare(void *arg)
+static ezlopi_error_t __prepare(void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
 
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
@@ -237,6 +241,7 @@ static int __prepare(void *arg)
             device_args->samples_spi_buf = device_args->dma_spi_buffer[0];
 
             presence_sensor_dev_item_prep(prep_arg, device_args);
+            ret = EZPI_SUCCESS;
         }
     }
 
