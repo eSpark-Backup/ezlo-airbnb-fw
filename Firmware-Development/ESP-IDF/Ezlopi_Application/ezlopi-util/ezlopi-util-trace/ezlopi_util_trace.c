@@ -119,7 +119,7 @@ void trace_color_print(const char *txt_color, uint8_t severity, const char *file
 
 #warning "No remedies for buffer over 'EZPI_CORE_LOG_BUFFER_SIZE'";
         // static char serial_log_format[10240];
-        char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
+        static char serial_log_format[EZPI_CORE_LOG_BUFFER_SIZE];
         snprintf(serial_log_format, sizeof(serial_log_format), "\x1B[%sm %s[%d]: ", txt_color, file, line);
         vsnprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), format, args);
         snprintf(serial_log_format + strlen(serial_log_format), sizeof(serial_log_format) - strlen(serial_log_format), "\x1B[0m");

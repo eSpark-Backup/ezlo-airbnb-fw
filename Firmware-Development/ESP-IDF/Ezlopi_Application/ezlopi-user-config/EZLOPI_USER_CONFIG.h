@@ -51,7 +51,7 @@
 
 #else // CONFIG_EZPI_HEAP_ENABLE
 
-#define ezlopi_malloc(who, x) malloc(x)
+#define ezlopi_malloc(who, x) heap_caps_malloc(x, MALLOC_CAP_SPIRAM)
 #define ezlopi_calloc(who, x, y) calloc(x, y)
 #define ezlopi_free(who, x) if(NULL != x) free(x);
 #define ezlopi_realloc(who, x, y) realloc(x, y)
@@ -67,7 +67,7 @@
 
 // EzloPi Versions
 #define EZPI_VERSION_API_SERIAL "1.0.0"
-#define EZPI_VERSION_API_BLE "1.0.0"
+    #define EZPI_VERSION_API_BLE "1.0.0"
 
 // User Configs
 #define EZPI_USR_CONFIG_ENABLE_HEARTBIT_LED
