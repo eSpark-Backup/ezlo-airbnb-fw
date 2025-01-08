@@ -18,12 +18,12 @@
 #include "EZLOPI_USER_CONFIG.h"
 #include "software_serial.h"
 
-static int __prepare(void *arg, void *user_arg);
-static int __init(l_ezlopi_item_t *item);
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg);
-static int __notify(l_ezlopi_item_t *item);
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
 
-static int __prepare_sound_detector_sensor(cJSON *cj_device, void *user_arg);
+static ezlopi_error_t __prepare_sound_detector_sensor(cJSON *cj_device, void *user_arg);
 
 static void __prepare_sound_detector_device_cloud_properties(l_ezlopi_device_t *device);
 static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
@@ -40,9 +40,9 @@ static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t *item
 }\
 */
 
-int sensor_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+ezlopi_error_t SENSOR_0096_sound_detector(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_SUCCESS;
     // TRACE_D("%s", ezlopi_actions_to_string(action));
     switch (action)
     {
@@ -118,35 +118,38 @@ static void __data_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_ob
 
     float dbSPL = parse_sound_packet(buffer, output_len);
     TRACE_E("Sound : %0.2fdb SPL", data->dbSPL);
-    if(dbSPL)
+    if (dbSPL)
         data->dbSPL = dbSPL;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t *item, void *arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
-    cJSON *cj_params = (cJSON *)arg;
-    stm32_sound_intensity_t *data = (stm32_sound_intensity_t *)item->user_arg;
-    if (!data || !cj_params)
+    if (item && arg)
     {
-        return ret;
+        cJSON *cj_params = (cJSON *)arg;
+        stm32_sound_intensity_t *data = (stm32_sound_intensity_t *)item->user_arg;
+        if (data)
+        {
+            EZPI_core_valueformatter_float_to_cjson(cj_params, data->dbSPL, item->cloud_properties.scale);
+            ret = EZPI_SUCCESS;
+        }
     }
-
-    ezlopi_valueformatter_float_to_cjson(cj_params, data->dbSPL, item->cloud_properties.scale);
 
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t *item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     s_sensor_sound_detector_setting_broadcast_interval_t *broadcast_settings = sound_detector_get_broadcast_iterval_setting();
     static uint32_t sec_count = 0;
     if (++sec_count >= broadcast_settings->broadcast_interval)
     {
         sec_count = 0;
-        ezlopi_device_value_updated_from_device_broadcast(item);
+        EZPI_core_device_value_updated_from_device_broadcast(item);
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
@@ -154,7 +157,7 @@ static int __notify(l_ezlopi_item_t *item)
 static void app_loop(void *pvParameters)
 {
     l_ezlopi_item_t *item = pvParameters;
-    stm32_sound_intensity_t *data = (stm32_sound_intensity_t *) item->user_arg;
+    stm32_sound_intensity_t *data = (stm32_sound_intensity_t *)item->user_arg;
 
     SwSerial *soundUart = sw_new(item->interface.uart.tx, item->interface.uart.rx, false, 256);
     TRACE_I("%u\n", soundUart->bitTime);
@@ -163,23 +166,23 @@ static void app_loop(void *pvParameters)
     {
         sw_open(soundUart, 9600);
 
-        while (1)   
+        while (1)
         {
             int len = sw_any(soundUart);
-            
+
             if (len > 0)
             {
                 uint8_t buffer[64];
                 for (size_t i = 0; i < len; i++)
                 {
                     buffer[i] = sw_read(soundUart);
-                    #if DEBUG_STM32_SOUND
+#if DEBUG_STM32_SOUND
                     printf("%02X ", buffer[i]);
-                    #endif
+#endif
                 }
 
                 float spl = parse_sound_packet(buffer, len);
-                if(spl)
+                if (spl)
                     data->dbSPL = spl;
             }
             vTaskDelay(100 / portTICK_RATE_MS);
@@ -187,14 +190,18 @@ static void app_loop(void *pvParameters)
     }
 
     vTaskDelete(NULL);
-    
 }
 
-static int __init(l_ezlopi_item_t *item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
     // ezlopi_uart_init(item->interface.uart.baudrate, item->interface.uart.tx, item->interface.uart.rx, __data_upcall, item->user_arg);
-    xTaskCreate(app_loop, "app_loop", 2 * 2048, item, 10, NULL);
+    if (item)
+    {
+        xTaskCreate(app_loop, "app_loop", 2 * 2048, item, 10, NULL);
+        ret = EZPI_SUCCESS;
+    }
+
     return ret;
 }
 
@@ -213,7 +220,7 @@ static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t *item
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_loudness;
     item->cloud_properties.value_type = value_type_loudness;
     item->cloud_properties.scale = scales_decibel;
@@ -225,9 +232,9 @@ static void __prepare_sound_detector_item_cloud_properties(l_ezlopi_item_t *item
     item->user_arg = user_arg;
 }
 
-static int __prepare(void *arg, void *user_arg)
+static ezlopi_error_t __prepare(void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
     s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     if (prep_arg)
     {
@@ -242,31 +249,26 @@ static int __prepare(void *arg, void *user_arg)
     return ret;
 }
 
-static int __prepare_sound_detector_sensor(cJSON *cj_device, void *user_arg)
+static ezlopi_error_t __prepare_sound_detector_sensor(cJSON *cj_device, void *user_arg)
 {
-    int ret = 0;
-    l_ezlopi_device_t *device = ezlopi_device_add_device(cj_device, NULL);
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    l_ezlopi_device_t *device = EZPI_core_device_add_device(cj_device, NULL);
 
     if (device)
     {
-        ret = 1;
         __prepare_sound_detector_device_cloud_properties(device);
 
-        l_ezlopi_item_t *item = ezlopi_device_add_item_to_device(device, sensor_0096_sound_detector);
+        l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, SENSOR_0096_sound_detector);
         if (item)
         {
             __prepare_sound_detector_item_cloud_properties(item, cj_device, user_arg);
             sensor_0096_sound_detector_settings_initialize(device, user_arg);
+            ret = EZPI_SUCCESS;
         }
         else
         {
-            ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
-    }
-    else
-    {
-        ret = -1;
     }
 
     return ret;

@@ -24,7 +24,7 @@ static void __prepare_device_cloud_properties(l_ezlopi_device_t* device)
 static void __prepare_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
 {
     CJSON_GET_VALUE_DOUBLE(cj_device, ezlopi_dev_type_str, item->interface_type);
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
     item->cloud_properties.show = true;
@@ -58,14 +58,14 @@ static void __prepare_cloud_item_properties_temperature(l_ezlopi_item_t* item, c
 static int __prepare_bme680_sensor_temperature(uint32_t *parent_id, cJSON* cj_device, void* user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Ambient Temperature Sensor");
+    l_ezlopi_device_t* device = EZPI_core_device_add_device(cj_device, "Ambient Temperature Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_device_cloud_properties_temperature(device);
         // *parent_id = device->cloud_properties.device_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0010_I2C_BME680);
+        l_ezlopi_item_t* item = EZPI_core_device_add_item_to_device(device, SENSOR_0010_i2c_bme680);
         if (item)
         {
             __prepare_cloud_item_properties_temperature(item, cj_device, user_arg);
@@ -73,7 +73,7 @@ static int __prepare_bme680_sensor_temperature(uint32_t *parent_id, cJSON* cj_de
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
     }
     else
@@ -103,14 +103,14 @@ static void __prepare_cloud_item_properties_humidity(l_ezlopi_item_t* item, cJSO
 static int __prepare_bme680_sensor_humidity(uint32_t parent_id, cJSON* cj_device, void* user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Ambient Humidity Sensor");
+    l_ezlopi_device_t* device = EZPI_core_device_add_device(cj_device, "Ambient Humidity Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_device_cloud_properties_humidity(device);
         // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0010_I2C_BME680);
+        l_ezlopi_item_t* item = EZPI_core_device_add_item_to_device(device, SENSOR_0010_i2c_bme680);
         if (item)
         {
             __prepare_cloud_item_properties_humidity(item, cj_device, user_arg);
@@ -118,7 +118,7 @@ static int __prepare_bme680_sensor_humidity(uint32_t parent_id, cJSON* cj_device
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
     }
     else
@@ -148,14 +148,14 @@ static void __prepare_cloud_item_properties_pressure(l_ezlopi_item_t* item, cJSO
 static int __prepare_bme680_sensor_pressure(uint32_t parent_id, cJSON* cj_device, void* user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Atmospheric Pressure Sensor");
+    l_ezlopi_device_t* device = EZPI_core_device_add_device(cj_device, "Atmospheric Pressure Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_device_cloud_properties_pressure(device);
         // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0010_I2C_BME680);
+        l_ezlopi_item_t* item = EZPI_core_device_add_item_to_device(device, SENSOR_0010_i2c_bme680);
         if (item)
         {
             __prepare_cloud_item_properties_pressure(item, cj_device, user_arg);
@@ -163,7 +163,7 @@ static int __prepare_bme680_sensor_pressure(uint32_t parent_id, cJSON* cj_device
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
     }
     else
@@ -241,14 +241,14 @@ static void __prepare_cloud_item_properties_altitude(l_ezlopi_item_t* item, cJSO
 static int __prepare_bme680_sensor_altitude(uint32_t parent_id, cJSON* cj_device, void* user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Altitude Sensor");
+    l_ezlopi_device_t* device = EZPI_core_device_add_device(cj_device, "Altitude Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_device_cloud_properties_altitude(device);
         // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0010_I2C_BME680);
+        l_ezlopi_item_t* item = EZPI_core_device_add_item_to_device(device, SENSOR_0010_i2c_bme680);
         if (item)
         {
             __prepare_cloud_item_properties_altitude(item, cj_device, user_arg);
@@ -256,7 +256,7 @@ static int __prepare_bme680_sensor_altitude(uint32_t parent_id, cJSON* cj_device
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
     }
     else
@@ -343,14 +343,14 @@ static void __prepare_cloud_item_properties_aqi_grade(l_ezlopi_item_t* item, cJS
 static int __prepare_bme680_sensor_aqi(uint32_t parent_id, cJSON* cj_device, void* user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Indoor Air Quality Sensor");
+    l_ezlopi_device_t* device = EZPI_core_device_add_device(cj_device, "Indoor Air Quality Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_device_cloud_properties_aqi(device);
         // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0010_I2C_BME680);
+        l_ezlopi_item_t* item = EZPI_core_device_add_item_to_device(device, SENSOR_0010_i2c_bme680);
         if (item)
         {
             __prepare_cloud_item_properties_aqi(item, cj_device, user_arg);
@@ -358,10 +358,10 @@ static int __prepare_bme680_sensor_aqi(uint32_t parent_id, cJSON* cj_device, voi
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
 
-        l_ezlopi_item_t* item2 = ezlopi_device_add_item_to_device(device, sensor_0010_I2C_BME680);
+        l_ezlopi_item_t* item2 = EZPI_core_device_add_item_to_device(device, SENSOR_0010_i2c_bme680);
         if (item2)
         {
             __prepare_cloud_item_properties_aqi_grade(item2, cj_device, user_arg);
@@ -369,7 +369,7 @@ static int __prepare_bme680_sensor_aqi(uint32_t parent_id, cJSON* cj_device, voi
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
     }
     else

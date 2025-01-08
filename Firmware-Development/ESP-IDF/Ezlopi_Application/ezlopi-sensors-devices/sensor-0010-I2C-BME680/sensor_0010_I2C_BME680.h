@@ -5,6 +5,6 @@
 #include "ezlopi_core_devices.h"
 
 int bme680_sensor_dev_item_prep(s_ezlopi_prep_arg_t *prep_args);
-int sensor_0010_I2C_BME680(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
+int SENSOR_0010_i2c_bme680(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg);
 
 #endif // _SENSOR_0010_I2C_BME680_H_

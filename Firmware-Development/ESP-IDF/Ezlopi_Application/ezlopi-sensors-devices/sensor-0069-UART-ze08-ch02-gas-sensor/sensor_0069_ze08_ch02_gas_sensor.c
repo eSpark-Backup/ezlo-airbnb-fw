@@ -1,4 +1,44 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    sensor_0069_ze08_ch02_gas_sensor.c
+ * @brief   perform some function on sensor_0069
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
 
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include <stdlib.h>
 #include <string.h>
 
@@ -22,30 +62,17 @@
 #include "device_airbnb.h"
 #include "EZLOPI_USER_CONFIG.h"
 
-static int __prepare(void* arg, void* user_arg);
-static int __init(l_ezlopi_item_t* item);
-static int __get_item(l_ezlopi_item_t* item, void* arg);
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg);
-static int __notify(l_ezlopi_item_t* item);
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
-static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON* cj_device, void* user_arg);
-static int __prepare_gas_sensor_vape(uint32_t parent_id, cJSON* cj_device, void* user_arg);
-static int __prepare_gas_sensor_smoke(uint32_t parent_id, cJSON* cj_device, void* user_arg);
-static int __prepare_gas_sensor_marijuana(uint32_t parent_id, cJSON* cj_device, void* user_arg);
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
 
-static void __prepare_smoke_alarm_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
-static void __prepare_security_threat_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
-static void __prepare_smoke_vape_device_cloud_properties(l_ezlopi_device_t* device);
-static void __prepare_smoke_vape_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
-static void __prepare_smoke_marijuana_device_cloud_properties(l_ezlopi_device_t* device);
-static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg);
-
-static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t size);
-
-static s_pms5003_sensor_object *pms_object;
-static ezlopi_smoke_t gases;
-static mics6814_t* mics6814;
-static ens160_t* ens160_sensor;
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
 
 /*
 {\
@@ -58,45 +85,124 @@ static ens160_t* ens160_sensor;
     \"baud\": 9600\
 }\
 */
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
-static const char* vape_alarm_token[] = {
+static ezlopi_error_t __prepare(void *arg, void *user_arg);
+static ezlopi_error_t __init(l_ezlopi_item_t *item);
+static ezlopi_error_t __get_item(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg);
+static ezlopi_error_t __notify(l_ezlopi_item_t *item);
+
+static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON *cj_device, void *user_arg);
+static int __prepare_gas_sensor_vape(uint32_t parent_id, cJSON *cj_device, void *user_arg);
+static int __prepare_gas_sensor_smoke(uint32_t parent_id, cJSON *cj_device, void *user_arg);
+static int __prepare_gas_sensor_marijuana(uint32_t parent_id, cJSON *cj_device, void *user_arg);
+
+static void __prepare_smoke_alarm_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
+static void __prepare_security_threat_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
+static void __prepare_smoke_vape_device_cloud_properties(l_ezlopi_device_t *device);
+static void __prepare_smoke_vape_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
+static void __prepare_smoke_marijuana_device_cloud_properties(l_ezlopi_device_t *device);
+static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg);
+
+static void __add_enums_to_json(cJSON *cj_result, const char **enums, uint8_t size);
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+
+static s_pms5003_sensor_object *pms_object;
+static ezlopi_smoke_t gases;
+static mics6814_t *mics6814;
+static ens160_t *ens160_sensor;
+
+static const char *vape_alarm_token[] = {
     "no_vape_detected",
     "vape_detected",
     "unknown",
 };
 
-static const char* marijuana_alarm_token[] = {
+static const char *marijuana_alarm_token[] = {
     "no_marijuana_detected",
     "marijuana_detected",
     "unknown",
 };
 
-static const char* smoke_alarm_token[] = {
+static const char *smoke_alarm_token[] = {
     "no_smoke",
     "smoke_detected",
     "unknown",
 };
 
-static bool ezlopi_detect_smoke(ezlopi_smoke_t* gases) {
-    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm25_standard: %d, gases->pm100_standard: %d, gases->ch2o : %d",gases->tvoc, gases->eco2, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
+
+ezlopi_error_t SENSOR_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
+{
+    ezlopi_error_t ret = EZPI_SUCCESS;
+    // TRACE_D("%s", EZPI_core_actions_to_string(action));
+    switch (action)
+    {
+    case EZLOPI_ACTION_PREPARE:
+    {
+        ret = __prepare(arg, user_arg);
+        break;
+    }
+    case EZLOPI_ACTION_INITIALIZE:
+    {
+        ret = __init(item);
+        break;
+    }
+    case EZLOPI_ACTION_GET_EZLOPI_VALUE:
+    {
+        ret = __get_cjson_value(item, arg);
+        break;
+    }
+    case EZLOPI_ACTION_NOTIFY_1000_MS:
+    {
+        ret = __notify(item);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return ret;
+}
+
+/*******************************************************************************
+ *                         Static Function Definitions
+ *******************************************************************************/
+
+static bool ezlopi_detect_smoke(ezlopi_smoke_t *gases)
+{
+    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm25_standard: %d, gases->pm100_standard: %d, gases->ch2o : %d", gases->tvoc, gases->eco2, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
     return (gases->tvoc > SMOKE_TVOC_THRESHOLD &&
             gases->eco2 > SMOKE_ECO2_THRESHOLD &&
             gases->pm25_standard > SMOKE_PM2_5_THRESHOLD &&
             gases->pm100_standard > SMOKE_PM10_0_THRESHOLD &&
-            gases->ch2o > SMOKE_CH2O_THRESHOLD );
+            gases->ch2o > SMOKE_CH2O_THRESHOLD);
 }
 
-static bool ezlopi_detect_vape(ezlopi_smoke_t* gases) {
-    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm10_standard: %d, gases->pm25_standard: %d, gases->pm100_standard : %d, gases->ch2o : %d",gases->tvoc, gases->eco2 ,gases->pm10_standard, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
+static bool ezlopi_detect_vape(ezlopi_smoke_t *gases)
+{
+    TRACE_E("gases->tvoc: %d, gases->eco2 : %0.2f, gases->pm10_standard: %d, gases->pm25_standard: %d, gases->pm100_standard : %d, gases->ch2o : %d", gases->tvoc, gases->eco2, gases->pm10_standard, gases->pm25_standard, gases->pm100_standard, gases->ch2o);
     return (gases->tvoc > VAPE_TVOC_THRESHOLD &&
-            gases->eco2 > VAPE_ECO2_THRESHOLD &&    
+            gases->eco2 > VAPE_ECO2_THRESHOLD &&
             gases->pm10_standard > VAPE_PM1_0_THRESHOLD &&
             gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
             gases->pm25_standard > VAPE_PM2_5_THRESHOLD &&
-            gases->ch2o > VAPE_CH2O_THRESHOLD );
+            gases->ch2o > VAPE_CH2O_THRESHOLD);
 }
 
-int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t* item, void* arg, void* user_arg)
+ezlopi_error_t sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t *item, void *arg, void *user_arg)
 {
     int ret = 0;
     // TRACE_D("%s", ezlopi_actions_to_string(action));
@@ -134,87 +240,88 @@ int sensor_0069_ze08_ch02_gas_sensor(e_ezlopi_actions_t action, l_ezlopi_item_t*
     return ret;
 }
 
-static int __get_item(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_item(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
     if (item && arg)
     {
-        cJSON* cj_result = (cJSON*)arg;
+        cJSON *cj_result = (cJSON *)arg;
         if (ezlopi_item_name_vape == item->cloud_properties.item_name)
         {
-            uint8_t size = sizeof(vape_alarm_token)/ sizeof(vape_alarm_token[0]);
+            uint8_t size = sizeof(vape_alarm_token) / sizeof(vape_alarm_token[0]);
             __add_enums_to_json(cj_result, vape_alarm_token, size);
         }
         else if (ezlopi_item_name_marijuana == item->cloud_properties.item_name)
         {
-            uint8_t size = sizeof(marijuana_alarm_token)/ sizeof(marijuana_alarm_token[0]);
-            __add_enums_to_json(cj_result, marijuana_alarm_token, size); 
+            uint8_t size = sizeof(marijuana_alarm_token) / sizeof(marijuana_alarm_token[0]);
+            __add_enums_to_json(cj_result, marijuana_alarm_token, size);
         }
         else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name)
         {
-            uint8_t size = sizeof(smoke_alarm_token)/ sizeof(smoke_alarm_token[0]);
+            uint8_t size = sizeof(smoke_alarm_token) / sizeof(smoke_alarm_token[0]);
             __add_enums_to_json(cj_result, smoke_alarm_token, size);
         }
-        ret = 1;
+        ret = EZPI_SUCCESS;
     }
     return ret;
 }
 
-static int __get_cjson_value(l_ezlopi_item_t* item, void* arg)
+static ezlopi_error_t __get_cjson_value(l_ezlopi_item_t *item, void *arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_FAILED;
 
-    cJSON* cj_params = (cJSON*)arg;
-    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
-    if(!ze08_ch2o_sensor || !cj_params)
+    if (item && arg)
     {
-        return ret;
+        cJSON *cj_params = (cJSON *)arg;
+        ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)item->user_arg;
+        if (ze08_ch2o_sensor)
+        {
+            if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
+            {
+                EZPI_core_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppb / 1000.0, item->cloud_properties.scale);
+            }
+            else if (ezlopi_item_name_vape == item->cloud_properties.item_name)
+            {
+                // bool detected = ze08_ch2o_sensor->ppm > 150.0;
+                bool detected = ezlopi_detect_vape(&gases);
+                ze08_ch2o_sensor->vape_detected = detected;
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, vape_alarm_token[detected]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, vape_alarm_token[detected]);
+            }
+            else if (ezlopi_item_name_marijuana == item->cloud_properties.item_name)
+            {
+                bool detected = 0;
+                ze08_ch2o_sensor->marijuana_detected = detected;
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, marijuana_alarm_token[detected]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, marijuana_alarm_token[detected]);
+            }
+            else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name)
+            {
+                bool detected = ezlopi_detect_smoke(&gases);
+                TRACE_E("Smoke : %d", detected);
+                ze08_ch2o_sensor->smoke_detected = detected;
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, smoke_alarm_token[detected]);
+                cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, smoke_alarm_token[detected]);
+            }
+            else if (ezlopi_item_name_security_threat == item->cloud_properties.item_name)
+            {
+                bool detected = ezlopi_detect_smoke(&gases);
+                ze08_ch2o_sensor->smoke_detected = detected;
+                EZPI_core_valueformatter_bool_to_cjson(cj_params, detected, item->cloud_properties.scale);
+            }
+
+            ret = EZPI_SUCCESS;
+        }
     }
 
-    ret = 1;
-
-    if (ezlopi_item_name_particulate_matter_1 == item->cloud_properties.item_name)
-    {
-        ezlopi_valueformatter_float_to_cjson(cj_params, ze08_ch2o_sensor->ppb/1000.0, item->cloud_properties.scale);
-    }
-    else if (ezlopi_item_name_vape == item->cloud_properties.item_name)
-    {
-        // bool detected = ze08_ch2o_sensor->ppm > 150.0;
-        bool detected = ezlopi_detect_vape(&gases);
-        ze08_ch2o_sensor->vape_detected = detected;
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, vape_alarm_token[detected]);
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, vape_alarm_token[detected]);
-    }
-    else if (ezlopi_item_name_marijuana == item->cloud_properties.item_name)
-    {
-        bool detected = 0;
-        ze08_ch2o_sensor->marijuana_detected = detected;
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, marijuana_alarm_token[detected]);
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, marijuana_alarm_token[detected]);
-    }
-    else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name)
-    {
-        bool detected = ezlopi_detect_smoke(&gases);
-        TRACE_E("Smoke : %d", detected);
-        ze08_ch2o_sensor->smoke_detected = detected;
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_valueFormatted_str, smoke_alarm_token[detected]);
-        cJSON_AddStringToObject(__FUNCTION__, cj_params, ezlopi_value_str, smoke_alarm_token[detected]);
-    }
-    else if (ezlopi_item_name_security_threat == item->cloud_properties.item_name)
-    {
-        bool detected = ezlopi_detect_smoke(&gases);
-        ze08_ch2o_sensor->smoke_detected = detected;
-        ezlopi_valueformatter_bool_to_cjson(cj_params, detected, item->cloud_properties.scale);
-    }
-    
     return ret;
 }
 
-static int __notify(l_ezlopi_item_t* item)
+static ezlopi_error_t __notify(l_ezlopi_item_t *item)
 {
-    int ret = 0;
-    
-    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
+    ezlopi_error_t ret = EZPI_FAILED;
+
+    ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)item->user_arg;
 
     if ((true == pms_is_data_available(&pms_object->pms_data)))
     {
@@ -224,17 +331,17 @@ static int __notify(l_ezlopi_item_t* item)
         pms_set_data_available_to_false(&pms_object->pms_data);
     }
 
-    dfrobot_ens160_get_data(ens160_sensor);
+    DFROBOT_ens160_get_data(ens160_sensor);
     gases.tvoc = ens160_sensor->data.tvoc;
     gases.eco2 = ens160_sensor->data.eco2;
     gases.nh3 = mics6814_get_gas(mics6814, MICS6814_GAS_NH3);
     gases.co = mics6814_get_gas(mics6814, MICS6814_GAS_CO);
-    gases.ch2o = ze08_ch2o_read_ppb(ze08_ch2o_sensor);
+    gases.ch2o = ZE08_ch2o_read_ppb(ze08_ch2o_sensor);
 
     if (ezlopi_item_name_vape == item->cloud_properties.item_name)
     {
         bool detected = ezlopi_detect_vape(&gases);
-        if(detected == ze08_ch2o_sensor->vape_detected)
+        if (detected == ze08_ch2o_sensor->vape_detected)
         {
             goto exit;
         }
@@ -242,7 +349,7 @@ static int __notify(l_ezlopi_item_t* item)
     else if (ezlopi_item_name_marijuana == item->cloud_properties.item_name)
     {
         bool detected = 0;
-        if(detected == ze08_ch2o_sensor->marijuana_detected)
+        if (detected == ze08_ch2o_sensor->marijuana_detected)
         {
             goto exit;
         }
@@ -250,33 +357,33 @@ static int __notify(l_ezlopi_item_t* item)
     else if (ezlopi_item_name_smoke_alarm == item->cloud_properties.item_name || ezlopi_item_name_security_threat == item->cloud_properties.item_name)
     {
         bool detected = ezlopi_detect_smoke(&gases);
-        if(detected == ze08_ch2o_sensor->smoke_detected)
+        if (detected == ze08_ch2o_sensor->smoke_detected)
         {
             goto exit;
         }
     }
 
-    ezlopi_device_value_updated_from_device_broadcast(item);
-    // ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
-    // if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
-    // {
-    //     ezlopi_device_value_updated_from_device_broadcast(item);
-    //     ze08_ch2o_sensor->available = false;
-    // }
-    // else
-    // {
-    //     ret = 1;
-    // }
-    exit:
+    ret = EZPI_core_device_value_updated_from_device_broadcast(item);
+// ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
+// if (ze08_ch2o_sensor && ze08_ch2o_sensor->available)
+// {
+//     ezlopi_device_value_updated_from_device_broadcast(item);
+//     ze08_ch2o_sensor->available = false;
+// }
+// else
+// {
+//     ret = 1;
+// }
+exit:
     return ret;
 }
 
-static int __init(l_ezlopi_item_t* item)
+static ezlopi_error_t __init(l_ezlopi_item_t *item)
 {
-    int ret = 0;
-    ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)item->user_arg;
+    ezlopi_error_t ret = EZPI_ERR_INIT_DEVICE_FAILED;
+    ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)item->user_arg;
     static bool intitialized = false;
-    if(intitialized)
+    if (intitialized)
     {
         TRACE_W("Already Initialized");
         return ret;
@@ -284,10 +391,9 @@ static int __init(l_ezlopi_item_t* item)
 
     if (ze08_ch2o_sensor)
     {
-        ret = 1;
         if (item->interface.uart.enable)
         {
-            if (false == ze08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
+            if (false == ZE08_ch2o_sensor_init(&item->interface.uart, ze08_ch2o_sensor))
             {
                 ret = -1;
             }
@@ -295,7 +401,6 @@ static int __init(l_ezlopi_item_t* item)
             {
                 intitialized = true;
             }
-            
         }
         intitialized = true;
 
@@ -319,11 +424,11 @@ static int __init(l_ezlopi_item_t* item)
             pms_init(pms_object);
         }
 
-        ens160_sensor = (ens160_t*) ezlopi_malloc(__FUNCTION__, sizeof(ens160_t));
+        ens160_sensor = (ens160_t *)ezlopi_malloc(__FUNCTION__, sizeof(ens160_t));
         if (ens160_sensor)
         {
             memset(ens160_sensor, 0, sizeof(ens160_t));
-            ens160_sensor->ezlopi_i2c = (s_ezlopi_i2c_master_t*) ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_i2c_master_t));
+            ens160_sensor->ezlopi_i2c = (s_ezlopi_i2c_master_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_i2c_master_t));
             ens160_sensor->ezlopi_i2c->clock_speed = ENS160_I2C_SPEED;
             ens160_sensor->ezlopi_i2c->scl = 17;
             ens160_sensor->ezlopi_i2c->sda = 18;
@@ -331,7 +436,7 @@ static int __init(l_ezlopi_item_t* item)
             ens160_sensor->ezlopi_i2c->address = ENS160_I2C_ADDRESS;
             ens160_sensor->ezlopi_i2c->enable = true;
 
-            if (NO_ERR != dfrobot_ens160_i2c_begin(ens160_sensor))
+            if (NO_ERR != DFROBOT_ens160_i2c_begin(ens160_sensor))
             {
                 TRACE_E("Communication with device failed, please check connection");
                 ret = -1;
@@ -340,17 +445,17 @@ static int __init(l_ezlopi_item_t* item)
             else
             {
                 TRACE_E("Begin ok!");
-                dfrobot_ens160_set_pwr_mode(ens160_sensor, ENS160_STANDARD_MODE);
+                DFROBOT_ens160_set_pwr_mode(ens160_sensor, ENS160_STANDARD_MODE);
                 // dfrobot_ens160_set_temp_and_hum(ens160_sensor, /*temperature=*/25.0, /*humidity=*/50.0); // These should be able to be changed froms settings.
-                dfrobot_ens160_set_temp_and_hum(ens160_sensor, 25, 50);
+                DFROBOT_ens160_set_temp_and_hum(ens160_sensor, 25, 50);
             }
         }
 
-        mics6814 = (mics6814_t*) ezlopi_malloc(__FUNCTION__, sizeof(mics6814_t));
-        if(mics6814)
+        mics6814 = (mics6814_t *)ezlopi_malloc(__FUNCTION__, sizeof(mics6814_t));
+        if (mics6814)
         {
-            mics6814->adc.ezlopi_i2c = (s_ezlopi_i2c_master_t*) ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_i2c_master_t));
-            if(mics6814->adc.ezlopi_i2c)
+            mics6814->adc.ezlopi_i2c = (s_ezlopi_i2c_master_t *)ezlopi_malloc(__FUNCTION__, sizeof(s_ezlopi_i2c_master_t));
+            if (mics6814->adc.ezlopi_i2c)
             {
                 mics6814->adc.ezlopi_i2c->enable = true;
                 mics6814->adc.ezlopi_i2c->address = ADS101X_I2C_ADDRESS_VDD;
@@ -359,27 +464,25 @@ static int __init(l_ezlopi_item_t* item)
                 mics6814->adc.ezlopi_i2c->scl = ADS101X_I2C_SCL;
                 mics6814->adc.ezlopi_i2c->clock_speed = ADS101X_I2C_SPEED;
                 mics6814_init(mics6814, -1); // For Harware Interrupt
-            }        
+                ret = EZPI_SUCCESS;
+            }
         }
     }
-    else
-    {
-        ret = -1;
-    }
+
     return ret;
 }
 
-static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t size)
+static void __add_enums_to_json(cJSON *cj_result, const char **enums, uint8_t size)
 {
     if (cj_result)
     {
         //-------------------  POSSIBLE JSON ENUM CONTENTS ----------------------------------
-        cJSON* json_array_enum = cJSON_CreateArray(__FUNCTION__);
+        cJSON *json_array_enum = cJSON_CreateArray(__FUNCTION__);
         if (NULL != json_array_enum)
         {
             for (uint8_t i = 0; i < size; i++)
             {
-                cJSON* json_value = cJSON_CreateString(__FUNCTION__, enums[i]);
+                cJSON *json_value = cJSON_CreateString(__FUNCTION__, enums[i]);
                 if (NULL != json_value)
                 {
                     cJSON_AddItemToArray(json_array_enum, json_value);
@@ -390,7 +493,7 @@ static void __add_enums_to_json(cJSON* cj_result, const char** enums, uint8_t si
     }
 }
 
-static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t* device)
+static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_level_sensor;
     device->cloud_properties.subcategory = subcategory_particulate_matter;
@@ -400,12 +503,12 @@ static void __prepare_ze08_ch2o_sensor_device_cloud_properties(l_ezlopi_device_t
     device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
-static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_particulate_matter_1;
     item->cloud_properties.value_type = value_type_substance_amount;
     item->cloud_properties.scale = scales_parts_per_million;
@@ -417,7 +520,7 @@ static void __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(l_ezlopi_item_t
     item->user_arg = user_arg;
 }
 
-static void __prepare_smoke_device_cloud_properties(l_ezlopi_device_t* device)
+static void __prepare_smoke_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_security_sensor;
     device->cloud_properties.subcategory = subcategory_smoke;
@@ -427,12 +530,12 @@ static void __prepare_smoke_device_cloud_properties(l_ezlopi_device_t* device)
     device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
-static void __prepare_smoke_alarm_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_smoke_alarm_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_smoke_alarm;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
@@ -444,12 +547,12 @@ static void __prepare_smoke_alarm_item_cloud_properties(l_ezlopi_item_t* item, c
     item->user_arg = user_arg;
 }
 
-static void __prepare_security_threat_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_security_threat_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_security_threat;
     item->cloud_properties.value_type = value_type_bool;
     item->cloud_properties.scale = NULL;
@@ -461,7 +564,7 @@ static void __prepare_security_threat_item_cloud_properties(l_ezlopi_item_t* ite
     item->user_arg = user_arg;
 }
 
-static void __prepare_smoke_vape_device_cloud_properties(l_ezlopi_device_t* device)
+static void __prepare_smoke_vape_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_vape;
@@ -471,12 +574,12 @@ static void __prepare_smoke_vape_device_cloud_properties(l_ezlopi_device_t* devi
     device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
-static void __prepare_smoke_vape_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_smoke_vape_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_vape;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
@@ -488,7 +591,7 @@ static void __prepare_smoke_vape_item_cloud_properties(l_ezlopi_item_t* item, cJ
     item->user_arg = user_arg;
 }
 
-static void __prepare_smoke_marijuana_device_cloud_properties(l_ezlopi_device_t* device)
+static void __prepare_smoke_marijuana_device_cloud_properties(l_ezlopi_device_t *device)
 {
     device->cloud_properties.category = category_generic_sensor;
     device->cloud_properties.subcategory = subcategory_marijuana;
@@ -498,12 +601,12 @@ static void __prepare_smoke_marijuana_device_cloud_properties(l_ezlopi_device_t*
     device->cloud_properties.parent_device_id = ezlopi_airbnb_get_parent_device_id(device->cloud_properties.device_id);
 }
 
-static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t* item, cJSON* cj_device, void* user_arg)
+static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t *item, cJSON *cj_device, void *user_arg)
 {
     item->interface_type = EZLOPI_DEVICE_INTERFACE_UART;
     item->cloud_properties.has_getter = true;
     item->cloud_properties.has_setter = false;
-    item->cloud_properties.item_id = ezlopi_cloud_generate_item_id();
+    item->cloud_properties.item_id = EZPI_core_cloud_generate_item_id();
     item->cloud_properties.item_name = ezlopi_item_name_marijuana;
     item->cloud_properties.value_type = value_type_token;
     item->cloud_properties.scale = NULL;
@@ -515,14 +618,15 @@ static void __prepare_smoke_marijuana_item_cloud_properties(l_ezlopi_item_t* ite
     item->user_arg = user_arg;
 }
 
-static int __prepare(void* arg, void* user_arg)
+static ezlopi_error_t __prepare(void *arg, void *user_arg)
 {
-    int ret = 0;
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    s_ezlopi_prep_arg_t *prep_arg = (s_ezlopi_prep_arg_t *)arg;
     uint32_t parent_id = 0;
-    s_ezlopi_prep_arg_t* prep_arg = (s_ezlopi_prep_arg_t*)arg;
+
     if (prep_arg)
     {
-        ze08_ch2o_sensor_data_t* ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t*)ezlopi_malloc(__FUNCTION__, sizeof(ze08_ch2o_sensor_data_t));
+        ze08_ch2o_sensor_data_t *ze08_ch2o_sensor = (ze08_ch2o_sensor_data_t *)ezlopi_malloc(__FUNCTION__, sizeof(ze08_ch2o_sensor_data_t));
         if (ze08_ch2o_sensor)
         {
             memset(ze08_ch2o_sensor, 0, sizeof(ze08_ch2o_sensor_data_t));
@@ -542,28 +646,25 @@ static int __prepare(void* arg, void* user_arg)
             {
                 ezlopi_free(__FUNCTION__, ze08_ch2o_sensor);
             }
-        }
-        else
-        {
-            ret = -1;
+
+            ret = EZPI_SUCCESS;
         }
     }
 
     return ret;
 }
 
-
-static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON* cj_device, void* user_arg)
+static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON *cj_device, void *user_arg)
 {
     int ret = 0;
-    l_ezlopi_device_t* ze08_ch2o_sensor_device = ezlopi_device_add_device(cj_device, "CH2O");
+    l_ezlopi_device_t *ze08_ch2o_sensor_device = EZPI_core_device_add_device(cj_device, "CH2O");
 
     if (ze08_ch2o_sensor_device)
     {
         ret = 1;
         __prepare_ze08_ch2o_sensor_device_cloud_properties(ze08_ch2o_sensor_device);
-        // *parent_id = ze08_ch2o_sensor_device->cloud_properties.device_id; 
-        l_ezlopi_item_t* ze08_ch02_ppm_item = ezlopi_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
+        // *parent_id = ze08_ch2o_sensor_device->cloud_properties.device_id;
+        l_ezlopi_item_t *ze08_ch02_ppm_item = EZPI_core_device_add_item_to_device(ze08_ch2o_sensor_device, sensor_0069_ze08_ch02_gas_sensor);
         if (ze08_ch02_ppm_item)
         {
             __prepare_ze08_ch2o_sensor_ppm_item_cloud_properties(ze08_ch02_ppm_item, cj_device, user_arg);
@@ -571,7 +672,7 @@ static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON* cj_device, void
         else
         {
             ret = -1;
-            ezlopi_device_free_device(ze08_ch2o_sensor_device);
+            EZPI_core_device_free_device(ze08_ch2o_sensor_device);
         }
     }
     else
@@ -582,46 +683,42 @@ static int __prepare_gas_sensor_ch2o(uint32_t *parent_id, cJSON* cj_device, void
     return ret;
 }
 
-static int __prepare_gas_sensor_vape(uint32_t parent_id, cJSON* cj_device, void* user_arg)
+static ezlopi_error_t __prepare_gas_sensor_vape(uint32_t parent_id, cJSON *cj_device, void *user_arg)
 {
-    int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Vape Sensor");
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    l_ezlopi_device_t *device = EZPI_core_device_add_device(cj_device, "Vape Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_smoke_vape_device_cloud_properties(device);
-        // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
+        // device->cloud_properties.parent_device_id = parent_id;
+        l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item)
         {
             __prepare_smoke_vape_item_cloud_properties(item, cj_device, user_arg);
+            ret = EZPI_SUCCESS;
         }
         else
         {
-            ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
-    }
-    else
-    {
-        ret = -1;
     }
 
     return ret;
 }
 
-static int __prepare_gas_sensor_smoke(uint32_t parent_id, cJSON* cj_device, void* user_arg)
+static ezlopi_error_t __prepare_gas_sensor_smoke(uint32_t parent_id, cJSON *cj_device, void *user_arg)
 {
-    int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Smoke Sensor");
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    l_ezlopi_device_t *device = EZPI_core_device_add_device(cj_device, "Smoke Sensor");
 
     if (device)
     {
         ret = 1;
         __prepare_smoke_device_cloud_properties(device);
-        // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
+        // device->cloud_properties.parent_device_id = parent_id;
+        l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item)
         {
             __prepare_smoke_alarm_item_cloud_properties(item, cj_device, user_arg);
@@ -629,57 +726,51 @@ static int __prepare_gas_sensor_smoke(uint32_t parent_id, cJSON* cj_device, void
         else
         {
             ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
             goto out;
         }
 
-        l_ezlopi_item_t* item_2 = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
+        l_ezlopi_item_t *item_2 = EZPI_core_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item_2)
         {
             __prepare_security_threat_item_cloud_properties(item_2, cj_device, user_arg);
+            ret = EZPI_SUCCESS;
         }
         else
         {
-            ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
 
         ezlopi_airbnb_set_device(device);
     }
-    else
-    {
-        ret = -1;
-    }
 
-    out:
+out:
     return ret;
 }
 
-static int __prepare_gas_sensor_marijuana(uint32_t parent_id, cJSON* cj_device, void* user_arg)
+static ezlopi_error_t __prepare_gas_sensor_marijuana(uint32_t parent_id, cJSON *cj_device, void *user_arg)
 {
-    int ret = 0;
-    l_ezlopi_device_t* device = ezlopi_device_add_device(cj_device, "Marijuana Sensor");
+    ezlopi_error_t ret = EZPI_ERR_PREP_DEVICE_PREP_FAILED;
+    l_ezlopi_device_t *device = EZPI_core_device_add_device(cj_device, "Marijuana Sensor");
 
     if (device)
     {
-        ret = 1;
         __prepare_smoke_marijuana_device_cloud_properties(device);
-        // device->cloud_properties.parent_device_id = parent_id; 
-        l_ezlopi_item_t* item = ezlopi_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
+        // device->cloud_properties.parent_device_id = parent_id;
+        l_ezlopi_item_t *item = EZPI_core_device_add_item_to_device(device, sensor_0069_ze08_ch02_gas_sensor);
         if (item)
         {
             __prepare_smoke_marijuana_item_cloud_properties(item, cj_device, user_arg);
+            ret = EZPI_SUCCESS;
         }
         else
         {
-            ret = -1;
-            ezlopi_device_free_device(device);
+            EZPI_core_device_free_device(device);
         }
-    }
-    else
-    {
-        ret = -1;
     }
 
     return ret;
 }
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/

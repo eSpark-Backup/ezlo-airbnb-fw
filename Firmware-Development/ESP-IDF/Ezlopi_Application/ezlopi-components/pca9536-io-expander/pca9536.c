@@ -28,7 +28,7 @@ static s_ezlopi_i2c_master_t *g_i2c_master_conf = NULL;
 bool pca9536_init(s_ezlopi_i2c_master_t *i2c_master_conf)
 {
     g_i2c_master_conf = i2c_master_conf;
-    return !ezlopi_i2c_master_init(i2c_master_conf); // ESP_OK to True
+    return !EZPI_hal_i2c_master_init(i2c_master_conf); // ESP_OK to True
 }
 
 bool pca9536_begin()
@@ -40,7 +40,7 @@ bool pca9536_begin()
 bool pca9536_is_connected(void)
 {
     uint8_t dummy_data;
-    esp_err_t result = ezlopi_i2c_master_read_from_device(g_i2c_master_conf, &dummy_data, 1);
+    esp_err_t result = EZPI_hal_i2c_master_read_from_device(g_i2c_master_conf, &dummy_data, 1);
     
     return !result; // ESP_OK to True
 }
@@ -164,7 +164,7 @@ PCA9536_error_t pca9536_read_i2c_buffer(uint8_t *dest, PCA9536_REGISTER_t startR
         return PCA9536_ERROR_INVALID_ADDRESS;
     }
 
-    esp_err_t ret =  ezlopi_i2c_master_write_to_device(g_i2c_master_conf, (uint8_t*) &startRegister, 1);
+    esp_err_t ret =  EZPI_hal_i2c_master_write_to_device(g_i2c_master_conf, (uint8_t*) &startRegister, 1);
     // _i2cPort->beginTransmission((uint8_t)_deviceAddress);
     // _i2cPort->write(startRegister);
     if (ret != ESP_OK)
@@ -173,7 +173,7 @@ PCA9536_error_t pca9536_read_i2c_buffer(uint8_t *dest, PCA9536_REGISTER_t startR
         return PCA9536_ERROR_READ;
     }
 
-    ret = ezlopi_i2c_master_read_from_device(g_i2c_master_conf, dest, len);
+    ret = EZPI_hal_i2c_master_read_from_device(g_i2c_master_conf, dest, len);
     // _i2cPort->requestFrom((uint8_t)_deviceAddress, (uint8_t)len);
     // for (int i = 0; i < len; i++)
     // {
@@ -198,7 +198,7 @@ PCA9536_error_t pca9536_write_i2c_buffer(uint8_t *src, PCA9536_REGISTER_t startR
         buffer[i+1] = src[i];
     }
     
-    esp_err_t ret =  ezlopi_i2c_master_write_to_device(g_i2c_master_conf, buffer, len + 1);
+    esp_err_t ret =  EZPI_hal_i2c_master_write_to_device(g_i2c_master_conf, buffer, len + 1);
     if (ret != ESP_OK)
     {
         return PCA9536_ERROR_WRITE;

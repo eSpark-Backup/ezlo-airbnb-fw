@@ -1,7 +1,61 @@
+/* ===========================================================================
+** Copyright (C) 2024 Ezlo Innovation Inc
+**
+** Under EZLO AVAILABLE SOURCE LICENSE (EASL) AGREEMENT
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+/**
+ * @file    pms5003.c
+ * @brief   perform some function on pms5003
+ * @author  xx
+ * @version 0.1
+ * @date    xx
+ */
+
+/*******************************************************************************
+ *                          Include Files
+ *******************************************************************************/
 #include "pms5003.h"
 
-static const char *TAG = "PMS";
+/*******************************************************************************
+ *                          Extern Data Declarations
+ *******************************************************************************/
 
+/*******************************************************************************
+ *                          Extern Function Declarations
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Type & Macro Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Static Function Prototypes
+ *******************************************************************************/
 
 static void pms_uart_setup(s_pms5003_sensor_object *pms_object);
 static esp_err_t pms_setup_control_gpio(gpio_num_t set_pin, gpio_num_t reset_pin);
@@ -15,6 +69,18 @@ static void pms_timer_callback(void *arg);
 static void ezlopi_pms5003_upcall(uint8_t *buffer, uint32_t output_len, s_ezlopi_uart_object_handle_t uart_object_handle);
 static void pms_timer_callback(void *arg);
 
+/*******************************************************************************
+ *                          Static Data Definitions
+ *******************************************************************************/
+static const char *TAG = "PMS";
+
+/*******************************************************************************
+ *                          Extern Data Definitions
+ *******************************************************************************/
+
+/*******************************************************************************
+ *                          Extern Function Definitions
+ *******************************************************************************/
 /*!
      @brief  Setups the hardware and detects a valid UART PM2.5
 */
@@ -33,7 +99,7 @@ void pms_init(s_pms5003_sensor_object *pms_object)
 */
 static void pms_uart_setup(s_pms5003_sensor_object *pms_object)
 {
-  ezlopi_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data);
+  EZPI_hal_uart_init(pms_object->pms_baud_rate, pms_object->pms_tx_pin, pms_object->pms_rx_pin, ezlopi_pms5003_upcall, &pms_object->pms_data);
 }
 
 /*!
@@ -252,3 +318,7 @@ void pms_set_data_available_to_false(PM25_AQI_Data *data)
     data->available = false;
   }
 }
+
+/*******************************************************************************
+ *                          End of File
+ *******************************************************************************/
