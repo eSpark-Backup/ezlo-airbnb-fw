@@ -101,12 +101,10 @@ static uint8_t ZE08_ch2o_sensor_checksum(uint8_t array[], uint8_t length)
 {
     uint8_t sum = 0;
 
-    for (int i = 1; i < length - 1; i++)
-        for (int i = 1; i < length - 1; i++)
-        {
-            sum += array[i];
-            sum += array[i];
-        }
+    for(int i = 1; i < length-1; i++)
+    {
+		sum += array[i];
+    }
 
     sum = (~sum) + 1;
     return sum;
